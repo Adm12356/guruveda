@@ -1,0 +1,33 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3">Exams</h1>
+<div class="admin-card">
+  <% if (exams.length === 0) { %>
+    <p class="text-muted mb-0">There are no exams for your batch right now. Check back later.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Exam</th><th>Questions</th><th>Time allowed</th><th>Status</th><th class="text-end"></th></tr></thead>
+        <tbody>
+          <% exams.forEach(e => { const finished = e.attempt_status === 'submitted' || e.attempt_status === 'auto_submitted'; %>
+            <tr>
+              <td><strong><%= e.title %></strong></td>
+              <td><%= e.question_count %> <small class="text-muted">(<%= e.total_marks %> marks)</small></td>
+              <td><%= e.duration_minutes %> min</td>
+              <td>
+                <% if (finished) { %><span class="badge text-bg-success">Completed: <%= e.score %> / <%= e.got_total %></span>
+                <% } else if (e.attempt_status === 'in_progress') { %><span class="badge text-bg-warning">In progress</span>
+                <% } else { %><span class="badge text-bg-secondary">Not taken</span><% } %>
+              </td>
+              <td class="text-end">
+                <% if (finished) { %><a class="btn btn-sm btn-outline-primary" href="/student/results/<%= e.id %>">View result</a>
+                <% } else if (e.attempt_status === 'in_progress') { %><a class="btn btn-sm btn-warning" href="/student/exams/<%= e.id %>/take">Resume</a>
+                <% } else { %><a class="btn btn-sm btn-primary" href="/student/exams/<%= e.id %>">Open</a><% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

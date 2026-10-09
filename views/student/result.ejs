@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+<% const pct = fmt.percent(attempt.score, attempt.total_marks); const passed = pct >= exam.pass_percent; %>
+<h1 class="h3 mb-3"><%= exam.title %></h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= attempt.score %> / <%= attempt.total_marks %></div><div class="text-muted">Score</div></div></div>
+  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= pct %>%</div><div class="text-muted">Percentage</div></div></div>
+  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><span class="text-<%= passed ? 'success' : 'danger' %>"><%= passed ? 'Pass' : 'Fail' %></span></div><div class="text-muted">Pass mark <%= exam.pass_percent %>%</div></div></div>
+  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= fmt.duration(new Date(attempt.submitted_at) - new Date(attempt.started_at)) %></div><div class="text-muted"><%= fmt.statusLabel(attempt.status) %></div></div></div>
+</div>
+
+<% if (exam.show_answers) { %>
+<div class="admin-card mb-4">
+  <h2 class="h5 mb-3">Answer review</h2>
+  <div class="table-responsive">
+    <table class="table mb-0 table-stack">
+      <thead><tr><th>#</th><th>Question</th><th>Your answer</th><th>Correct answer</th><th>Marks</th></tr></thead>
+      <tbody>
+        <% review.forEach((q, i) => { const right = q.selected_option === q.correct_option; %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td class="msg-text"><%= q.question_text %></td>
+            <td><% if (q.selected_option) { %><span class="badge text-bg-<%= right ? 'success' : 'danger' %>"><%= q.selected_option %></span> <%= q['option_' + q.selected_option.toLowerCase()] %><% } else { %><span class="text-muted">Not answered</span><% } %></td>
+            <td><span class="badge text-bg-success"><%= q.correct_option %></span> <%= q['option_' + q.correct_option.toLowerCase()] %></td>
+            <td><%= right ? q.marks : 0 %> / <%= q.marks %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<% } %>
+<a class="btn btn-outline-primary" href="/student/results">All my results</a>
+<%- include('partials/footer') %>

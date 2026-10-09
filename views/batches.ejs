@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+<%- include('partials/page-header', { heading: 'Batches', sub: 'Pick the age group and timing that fits your child.' }) %>
+
+<section class="section">
+  <div class="container">
+    <% if (batches.length === 0) { %>
+      <p>New batches will be announced soon. <a href="/contact">Contact us</a> to join the waiting list.</p>
+    <% } else { %>
+      <div class="row g-4">
+        <% batches.forEach(b => { %>
+          <div class="col-md-6 col-lg-4"><%- include('partials/batch-card', { b }) %></div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

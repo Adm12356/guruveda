@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1">Results: <%= exam.title %></h1>
+    <p class="text-muted mb-0">Batch: <%= batchName %> &middot; Pass mark: <%= exam.pass_percent %>%</p>
+  </div>
+  <a class="btn btn-outline-secondary" href="/admin/exams">Back to exams</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= stats.finished %>/<%= stats.total %></div><div class="text-muted">Submitted</div></div></div>
+  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= stats.average === null ? '-' : stats.average + '%' %></div><div class="text-muted">Average score</div></div></div>
+  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= stats.highest === null ? '-' : stats.highest + '%' %></div><div class="text-muted">Highest score</div></div></div>
+  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= stats.passed %></div><div class="text-muted">Passed</div></div></div>
+</div>
+
+<div class="admin-card">
+  <% if (rows.length === 0) { %>
+    <p class="text-muted mb-0">No students are assigned to this batch yet.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Student</th><th>Score</th><th>Percentage</th><th>Result</th><th>Time taken</th><th>Submitted</th><th>How</th><th></th></tr></thead>
+        <tbody>
+          <% rows.forEach(r => { %>
+            <% const done = r.status === 'submitted' || r.status === 'auto_submitted'; %>
+            <% const pct = done ? fmt.percent(r.score, r.total_marks) : null; %>
+            <tr>
+              <td><strong><%= r.name %></strong><br><small class="text-muted"><%= r.username %></small></td>
+              <% if (done) { %>
+                <td><%= r.score %> / <%= r.total_marks %></td>
+                <td><%= pct %>%</td>
+                <td><span class="badge text-bg-<%= pct >= exam.pass_percent ? 'success' : 'danger' %>"><%= pct >= exam.pass_percent ? 'Pass' : 'Fail' %></span></td>
+                <td><%= fmt.duration(new Date(r.submitted_at) - new Date(r.started_at)) %></td>
+                <td><%= fmt.dateTime(r.submitted_at) %></td>
+                <td><%= fmt.statusLabel(r.status) %></td>
+              <% } else if (r.status === 'in_progress') { %>
+                <td colspan="6"><span class="badge text-bg-warning">In progress</span> started <%= fmt.dateTime(r.started_at) %></td>
+              <% } else { %>
+                <td colspan="6" class="text-muted">Not attempted</td>
+              <% } %>
+              <td class="text-end">
+                <% if (r.attempt_id) { %>
+                  <form method="POST" action="/admin/exams/<%= exam.id %>/attempts/<%= r.attempt_id %>/delete" onsubmit="return confirm('Reset this attempt? The student will be able to take the exam again and the current result will be deleted.')">
+                    <input type="hidden" name="_csrf" value="<%= csrf %>">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Reset</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

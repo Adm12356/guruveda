@@ -1,0 +1,27 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3">My results</h1>
+<div class="admin-card">
+  <% if (results.length === 0) { %>
+    <p class="text-muted mb-0">You have not completed any exams yet.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Exam</th><th>Date</th><th>Score</th><th>Percentage</th><th>Result</th><th>Time taken</th><th>Submission</th></tr></thead>
+        <tbody>
+          <% results.forEach(r => { const pct = fmt.percent(r.score, r.total_marks); %>
+            <tr>
+              <td><a href="/student/results/<%= r.exam_id %>"><%= r.title %></a></td>
+              <td><%= fmt.dateTime(r.submitted_at) %></td>
+              <td><%= r.score %> / <%= r.total_marks %></td>
+              <td><%= pct %>%</td>
+              <td><span class="badge text-bg-<%= pct >= r.pass_percent ? 'success' : 'danger' %>"><%= pct >= r.pass_percent ? 'Pass' : 'Fail' %></span></td>
+              <td><%= fmt.duration(new Date(r.submitted_at) - new Date(r.started_at)) %></td>
+              <td><%= fmt.statusLabel(r.status) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

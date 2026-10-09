@@ -1,0 +1,63 @@
+<%- include('partials/header') %>
+<%- include('partials/page-header', { heading: 'Contact us', sub: 'Send a message or book a free demo class. We will call you back.' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="row gy-5">
+      <div class="col-lg-7">
+        <% if (errors.length) { %>
+          <div class="alert alert-danger" role="alert">
+            <ul class="mb-0">
+              <% errors.forEach(err => { %><li><%= err %></li><% }) %>
+            </ul>
+          </div>
+        <% } %>
+        <form method="POST" action="/contact" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="name" class="form-label">Your name</label>
+              <input type="text" class="form-control" id="name" name="name" value="<%= form.name %>" required>
+            </div>
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Phone number</label>
+              <input type="tel" class="form-control" id="phone" name="phone" value="<%= form.phone %>" required>
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email (optional)</label>
+              <input type="email" class="form-control" id="email" name="email" value="<%= form.email %>">
+            </div>
+            <div class="col-md-6">
+              <label for="batch_interest" class="form-label">Batch you are interested in</label>
+              <select class="form-select" id="batch_interest" name="batch_interest">
+                <option value="">Not sure yet</option>
+                <% batches.forEach(b => { %>
+                  <option value="<%= b.name %>" <%= form.batch_interest === b.name ? 'selected' : '' %>><%= b.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="message" class="form-label">Message</label>
+              <textarea class="form-control" id="message" name="message" rows="5" required><%= form.message %></textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-bead btn-lg">Send message</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-lg-5">
+        <h2 class="h4">Visit or call</h2>
+        <address>
+          <%= site.address %><br>
+          <a href="tel:<%= site.phone.replace(/\s/g, '') %>"><%= site.phone %></a><br>
+          <a href="mailto:<%= site.email %>"><%= site.email %></a>
+        </address>
+        <p><strong>Open:</strong> <%= site.hours %></p>
+        <!-- Paste a Google Maps embed <iframe> here -->
+        <div class="map-slot">Map goes here</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3"><%= isEdit ? 'Edit exam' : 'Add exam' %></h1>
+<div class="admin-card">
+  <% if (errors.length) { %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+  <form method="POST" action="<%= action %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label for="title" class="form-label">Exam title</label>
+        <input type="text" class="form-control" id="title" name="title" value="<%= x.title %>" required>
+      </div>
+      <div class="col-md-4">
+        <label for="batch_id" class="form-label">Batch that can take this exam</label>
+        <select class="form-select" id="batch_id" name="batch_id" required>
+          <option value="">Choose a batch</option>
+          <% batches.forEach(b => { %><option value="<%= b.id %>" <%= Number(x.batch_id) === b.id ? 'selected' : '' %>><%= b.name %></option><% }) %>
+        </select>
+      </div>
+      <div class="col-12">
+        <label for="description" class="form-label">Instructions for students (optional)</label>
+        <textarea class="form-control" id="description" name="description" rows="3"><%= x.description || '' %></textarea>
+      </div>
+      <div class="col-md-4">
+        <label for="duration_minutes" class="form-label">Timer (minutes)</label>
+        <input type="number" min="1" max="300" class="form-control" id="duration_minutes" name="duration_minutes" value="<%= isNaN(x.duration_minutes) ? '' : x.duration_minutes %>" required>
+        <div class="form-text">The exam is submitted automatically when time runs out.</div>
+      </div>
+      <div class="col-md-4">
+        <label for="pass_percent" class="form-label">Pass percentage</label>
+        <input type="number" min="0" max="100" class="form-control" id="pass_percent" name="pass_percent" value="<%= isNaN(x.pass_percent) ? '' : x.pass_percent %>" required>
+      </div>
+      <div class="col-md-4 d-flex flex-column justify-content-end gap-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="show_answers" name="show_answers" value="1" <%= x.show_answers ? 'checked' : '' %>>
+          <label class="form-check-label" for="show_answers">Show correct answers after submitting</label>
+        </div>
+        <% if (isEdit) { %>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="is_published" name="is_published" value="1" <%= x.is_published ? 'checked' : '' %>>
+          <label class="form-check-label" for="is_published">Published (visible to students)</label>
+        </div>
+        <% } %>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit"><%= isEdit ? 'Save changes' : 'Create and add questions' %></button>
+        <a class="btn btn-link" href="/admin/exams">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+<%- include('partials/footer') %>

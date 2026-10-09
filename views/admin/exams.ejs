@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h1 class="h3 mb-0">Exams</h1>
+  <a class="btn btn-primary" href="/admin/exams/new">Add exam</a>
+</div>
+<div class="admin-card">
+  <% if (exams.length === 0) { %>
+    <p class="text-muted mb-0">No exams yet. Create one, add questions, then publish it.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Exam</th><th>Batch</th><th>Timer</th><th>Questions</th><th>Submitted</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+          <% exams.forEach(e => { %>
+            <tr>
+              <td><strong><%= e.title %></strong></td>
+              <td><%= e.batch_name %></td>
+              <td><%= e.duration_minutes %> min</td>
+              <td><%= e.question_count %> <small class="text-muted">(<%= e.total_marks %> marks)</small></td>
+              <td><%= e.submitted_count %></td>
+              <td><span class="badge text-bg-<%= e.is_published ? 'success' : 'secondary' %>"><%= e.is_published ? 'Published' : 'Draft' %></span></td>
+              <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-outline-secondary" href="/admin/exams/<%= e.id %>/questions">Questions</a>
+                <a class="btn btn-sm btn-outline-secondary" href="/admin/exams/<%= e.id %>/results">Results</a>
+                <a class="btn btn-sm btn-outline-primary" href="/admin/exams/<%= e.id %>/edit">Edit</a>
+                <form method="POST" action="/admin/exams/<%= e.id %>/publish" class="d-inline">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button class="btn btn-sm btn-outline-success" type="submit"><%= e.is_published ? 'Unpublish' : 'Publish' %></button>
+                </form>
+                <form method="POST" action="/admin/exams/<%= e.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this exam with all its questions and results?')">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

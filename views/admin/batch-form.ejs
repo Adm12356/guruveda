@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3"><%= isEdit ? 'Edit batch' : 'Add batch' %></h1>
+<div class="admin-card">
+  <% if (errors.length) { %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+  <form method="POST" action="<%= action %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="name" class="form-label">Batch name</label>
+        <input type="text" class="form-control" id="name" name="name" value="<%= b.name %>" required>
+      </div>
+      <div class="col-md-6">
+        <label for="level" class="form-label">Level</label>
+        <input type="text" class="form-control" id="level" name="level" value="<%= b.level %>" placeholder="Level 1-2 (Beginner)" required>
+      </div>
+      <div class="col-md-4">
+        <label for="age_group" class="form-label">Age group</label>
+        <input type="text" class="form-control" id="age_group" name="age_group" value="<%= b.age_group %>" placeholder="5-7 years" required>
+      </div>
+      <div class="col-md-4">
+        <label for="days" class="form-label">Days</label>
+        <input type="text" class="form-control" id="days" name="days" value="<%= b.days %>" placeholder="Mon, Wed, Fri" required>
+      </div>
+      <div class="col-md-4">
+        <label for="timing" class="form-label">Timing</label>
+        <input type="text" class="form-control" id="timing" name="timing" value="<%= b.timing %>" placeholder="4:00 PM - 5:00 PM" required>
+      </div>
+      <div class="col-md-3">
+        <label for="mode" class="form-label">Mode</label>
+        <select class="form-select" id="mode" name="mode">
+          <% modes.forEach(m => { %><option value="<%= m %>" <%= b.mode === m ? 'selected' : '' %>><%= m %></option><% }) %>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="seats_left" class="form-label">Seats left</label>
+        <input type="number" min="0" class="form-control" id="seats_left" name="seats_left" value="<%= isNaN(b.seats_left) ? '' : b.seats_left %>" required>
+      </div>
+      <div class="col-md-3">
+        <label for="fee" class="form-label">Fee (optional)</label>
+        <input type="text" class="form-control" id="fee" name="fee" value="<%= b.fee %>" placeholder="Rs. 1,500 / month">
+      </div>
+      <div class="col-md-3 d-flex align-items-end">
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <%= b.is_active ? 'checked' : '' %>>
+          <label class="form-check-label" for="is_active">Show on website</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit"><%= isEdit ? 'Save changes' : 'Add batch' %></button>
+        <a class="btn btn-link" href="/admin/batches">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+<%- include('partials/footer') %>

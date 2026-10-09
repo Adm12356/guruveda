@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+<%- include('partials/page-header', { heading: 'Events', sub: 'Championships, workshops and celebrations at our centre.' }) %>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Upcoming</h2>
+    <% if (upcoming.length === 0) { %>
+      <p>No events are scheduled right now. Check back soon.</p>
+    <% } else { %>
+      <ul class="event-list list-unstyled mb-0">
+        <% upcoming.forEach(e => { %><%- include('partials/event-row', { e }) %><% }) %>
+      </ul>
+    <% } %>
+  </div>
+</section>
+
+<section class="section section-tint">
+  <div class="container">
+    <h2 class="section-title">Past events</h2>
+    <% if (past.length === 0) { %>
+      <p class="mb-0">Past events will appear here.</p>
+    <% } else { %>
+      <div class="row g-4">
+        <% past.forEach(e => { %>
+          <div class="col-sm-6 col-lg-4">
+            <article class="past-card h-100">
+              <div class="photo-slot photo-slot-sm" style="--img: url('/images/events/<%= e.image || 'none' %>');" role="img" aria-label="<%= e.title %>"></div>
+              <div class="p-3">
+                <h3 class="h6 mb-1"><%= e.title %></h3>
+                <p class="meta mb-0"><%= new Date(e.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
+              </div>
+            </article>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

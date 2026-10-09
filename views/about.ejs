@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+<%- include('partials/page-header', { heading: 'About us', sub: 'A friendly place where children learn to calculate with their minds.' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="row gy-4 align-items-center">
+      <div class="col-lg-6">
+        <h2 class="section-title">Our story</h2>
+        <p>Replace this with a short history of your institute: when you started, why you teach abacus, and what makes your classes different.</p>
+        <p>Our trainers are certified, our batches are small, and every child moves up the levels at a pace that suits them.</p>
+      </div>
+      <div class="col-lg-6">
+        <!-- Add public/images/about/class.jpg to replace the placeholder -->
+        <div class="photo-slot" style="--img: url('/images/about/class.jpg');" role="img" aria-label="Students in an abacus class"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint">
+  <div class="container">
+    <h2 class="section-title">How learning works</h2>
+    <ol class="steps">
+      <li><strong>Demo class.</strong> Your child tries the abacus for free.</li>
+      <li><strong>Placement.</strong> We suggest the right level and batch.</li>
+      <li><strong>Weekly classes.</strong> Bead work first, then mental visualisation.</li>
+      <li><strong>Level exams.</strong> Certificates after every level.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Our trainers</h2>
+    <p>Add your trainers' names, qualifications and experience here.</p>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

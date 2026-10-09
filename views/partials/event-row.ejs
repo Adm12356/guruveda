@@ -1,0 +1,14 @@
+<li class="event-row">
+  <div class="date-block" aria-hidden="true">
+    <span class="d-day"><%= new Date(e.event_date).getDate() %></span>
+    <span class="d-mon"><%= new Date(e.event_date).toLocaleDateString('en-IN', { month: 'short' }) %></span>
+  </div>
+  <div>
+    <h3 class="h5 mb-1"><%= e.title %></h3>
+    <p class="mb-1"><%= e.description %></p>
+    <p class="meta mb-0">
+      <%= new Date(e.event_date).toLocaleString('en-IN', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' }) %>
+      <% if (e.location) { %> at <%= e.location %><% } %>
+    </p>
+  </div>
+</li>

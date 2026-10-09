@@ -1,0 +1,44 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3"><%= isEdit ? 'Edit student' : 'Add student' %></h1>
+<div class="admin-card">
+  <% if (errors.length) { %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+  <form method="POST" action="<%= action %>" autocomplete="off">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="name" class="form-label">Student name</label>
+        <input type="text" class="form-control" id="name" name="name" value="<%= s.name %>" required>
+      </div>
+      <div class="col-md-6">
+        <label for="batch_id" class="form-label">Batch</label>
+        <select class="form-select" id="batch_id" name="batch_id" required>
+          <option value="">Choose a batch</option>
+          <% batches.forEach(b => { %><option value="<%= b.id %>" <%= Number(s.batch_id) === b.id ? 'selected' : '' %>><%= b.name %></option><% }) %>
+        </select>
+        <div class="form-text">The student will only see exams set for this batch.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username" name="username" value="<%= s.username %>" required>
+      </div>
+      <div class="col-md-6">
+        <label for="password" class="form-label"><%= isEdit ? 'New password (leave blank to keep the current one)' : 'Password' %></label>
+        <input type="text" class="form-control" id="password" name="password" <%= isEdit ? '' : 'required' %> minlength="6">
+        <div class="form-text">Share the username and password with the student. They are stored securely and cannot be viewed later.</div>
+      </div>
+      <div class="col-12">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <%= s.is_active ? 'checked' : '' %>>
+          <label class="form-check-label" for="is_active">Account is active (can log in)</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit"><%= isEdit ? 'Save changes' : 'Add student' %></button>
+        <a class="btn btn-link" href="/admin/students">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+<%- include('partials/footer') %>

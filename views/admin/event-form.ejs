@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3"><%= isEdit ? 'Edit event' : 'Add event' %></h1>
+<div class="admin-card">
+  <% if (errors.length) { %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+  <form method="POST" action="<%= action %>" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" class="form-control" id="title" name="title" value="<%= ev.title %>" required>
+      </div>
+      <div class="col-md-4">
+        <label for="event_date" class="form-label">Date and time</label>
+        <input type="datetime-local" class="form-control" id="event_date" name="event_date" value="<%= ev.event_date %>" required>
+      </div>
+      <div class="col-12">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" class="form-control" id="location" name="location" value="<%= ev.location || '' %>">
+      </div>
+      <div class="col-12">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="4"><%= ev.description || '' %></textarea>
+      </div>
+      <div class="col-12">
+        <label for="image" class="form-label">Photo (JPG, PNG or WEBP, up to 5 MB)</label>
+        <% if (ev.image) { %>
+          <div class="mb-2">
+            <img src="/images/events/<%= ev.image %>" alt="Current photo" style="max-height:120px;border-radius:8px">
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" name="remove_image" value="1" id="remove_image">
+              <label class="form-check-label" for="remove_image">Remove current photo</label>
+            </div>
+          </div>
+        <% } %>
+        <input type="file" class="form-control" id="image" name="image" accept=".jpg,.jpeg,.png,.webp">
+        <% if (ev.image) { %><div class="form-text">Choose a new file to replace the current photo.</div><% } %>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit"><%= isEdit ? 'Save changes' : 'Add event' %></button>
+        <a class="btn btn-link" href="/admin/events">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+<%- include('partials/footer') %>

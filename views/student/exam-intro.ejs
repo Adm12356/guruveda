@@ -1,0 +1,25 @@
+<%- include('partials/header') %>
+<div class="admin-card" style="max-width:720px">
+  <h1 class="h3"><%= exam.title %></h1>
+  <% if (exam.description) { %><p class="msg-text"><%= exam.description %></p><% } %>
+  <ul>
+    <li><%= exam.question_count %> questions, <%= exam.total_marks %> marks in total</li>
+    <li>Time allowed: <strong><%= exam.duration_minutes %> minutes</strong></li>
+    <li>Pass mark: <%= exam.pass_percent %>%</li>
+    <li>You can take this exam <strong>only once</strong>.</li>
+    <li>The timer starts as soon as you press the button and <strong>keeps running</strong> even if you leave the page.</li>
+    <li>When the time ends, your exam is <strong>submitted automatically</strong> with the answers you have chosen.</li>
+  </ul>
+  <% if (!attempt) { %>
+    <form method="POST" action="/student/exams/<%= exam.id %>/start">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <button class="btn btn-primary btn-lg" type="submit">Start exam</button>
+      <a class="btn btn-link" href="/student/exams">Back</a>
+    </form>
+  <% } else if (attempt.status === 'in_progress') { %>
+    <a class="btn btn-warning btn-lg" href="/student/exams/<%= exam.id %>/take">Resume exam</a>
+  <% } else { %>
+    <a class="btn btn-outline-primary" href="/student/results/<%= exam.id %>">View your result</a>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

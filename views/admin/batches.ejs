@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h1 class="h3 mb-0">Batches</h1>
+  <a class="btn btn-primary" href="/admin/batches/new">Add batch</a>
+</div>
+<div class="admin-card">
+  <% if (batches.length === 0) { %>
+    <p class="text-muted mb-0">No batches yet. Add your first one.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Name</th><th>Level</th><th>Age</th><th>Days and time</th><th>Mode</th><th>Seats</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+          <% batches.forEach(b => { %>
+            <tr>
+              <td><%= b.name %></td>
+              <td><%= b.level %></td>
+              <td><%= b.age_group %></td>
+              <td><%= b.days %><br><small class="text-muted"><%= b.timing %></small></td>
+              <td><%= b.mode %></td>
+              <td><%= b.seats_left %></td>
+              <td><span class="badge text-bg-<%= b.is_active ? 'success' : 'secondary' %>"><%= b.is_active ? 'Shown' : 'Hidden' %></span></td>
+              <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-outline-primary" href="/admin/batches/<%= b.id %>/edit">Edit</a>
+                <form method="POST" action="/admin/batches/<%= b.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this batch?')">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

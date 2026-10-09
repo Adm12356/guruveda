@@ -1,0 +1,15 @@
+<article class="batch-card h-100">
+  <h3 class="h4"><%= b.name %></h3>
+  <p class="level mb-3"><%= b.level %></p>
+  <dl class="batch-facts">
+    <dt>Age</dt><dd><%= b.age_group %></dd>
+    <dt>Days</dt><dd><%= b.days %></dd>
+    <dt>Time</dt><dd><%= b.timing %></dd>
+    <dt>Mode</dt><dd><%= b.mode %></dd>
+    <% if (b.fee) { %><dt>Fee</dt><dd><%= b.fee %></dd><% } %>
+  </dl>
+  <p class="seats <%= b.seats_left <= 3 ? 'seats-low' : '' %>">
+    <% if (b.seats_left <= 0) { %>Batch full<% } else { %><%= b.seats_left %> seat<%= b.seats_left === 1 ? '' : 's' %> left<% } %>
+  </p>
+  <a class="btn btn-outline-ink" href="/contact?batch=<%= encodeURIComponent(b.name) %>">Ask about this batch</a>
+</article>

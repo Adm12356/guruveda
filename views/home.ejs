@@ -1,0 +1,97 @@
+<%- include('partials/header') %>
+
+<!-- Slider -->
+<div id="homeSlider" class="carousel slide hero-slider" data-bs-ride="carousel" data-bs-interval="5500" aria-label="Highlights">
+  <div class="carousel-indicators">
+    <% slides.forEach((s, i) => { %>
+      <button type="button" data-bs-target="#homeSlider" data-bs-slide-to="<%= i %>" class="<%= i === 0 ? 'active' : '' %>" <%= i === 0 ? 'aria-current=true' : '' %> aria-label="Slide <%= i + 1 %>"></button>
+    <% }) %>
+  </div>
+  <div class="carousel-inner">
+    <% slides.forEach((s, i) => { %>
+      <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+        <div class="slide tone-<%= s.tone %>" style="--img: url('/images/slider/<%= s.image %>');">
+          <div class="container">
+            <div class="slide-copy">
+              <h1 class="slide-title"><%= s.title %></h1>
+              <p class="lead"><%= s.text %></p>
+              <a class="btn btn-bead btn-lg" href="<%= s.cta.href %>"><%= s.cta.label %></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#homeSlider" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#homeSlider" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+<!-- Why abacus -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Why children learn abacus here</h2>
+    <div class="row gy-4 why">
+      <div class="col-md-4">
+        <h3 class="h5">Faster calculation</h3>
+        <p>Children learn to picture the beads and add, subtract, multiply and divide in their heads, often faster than with a calculator.</p>
+      </div>
+      <div class="col-md-4">
+        <h3 class="h5">Sharper focus</h3>
+        <p>Timed practice and listening drills build concentration and memory that carry over to school work.</p>
+      </div>
+      <div class="col-md-4">
+        <h3 class="h5">Confidence in maths</h3>
+        <p>Small batches and step-by-step levels mean every child gets attention and a clear sense of progress.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Upcoming events -->
+<section class="section section-tint">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+      <h2 class="section-title mb-0">Coming up</h2>
+      <a href="/events" class="link-strong">All events</a>
+    </div>
+    <% if (events.length === 0) { %>
+      <p class="mb-0">No events are scheduled right now. Check back soon.</p>
+    <% } else { %>
+      <ul class="event-list list-unstyled mb-0">
+        <% events.forEach(e => { %>
+          <%- include('partials/event-row', { e }) %>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+</section>
+
+<!-- Batches -->
+<section class="section">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+      <h2 class="section-title mb-0">Find a batch for your child</h2>
+      <a href="/batches" class="link-strong">All batches</a>
+    </div>
+    <div class="row g-4">
+      <% batches.forEach(b => { %>
+        <div class="col-md-4"><%- include('partials/batch-card', { b }) %></div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- Call to action -->
+<section class="cta-band">
+  <div class="container text-center">
+    <h2>Book a free demo class</h2>
+    <p class="lead">Let your child try the abacus before you decide.</p>
+    <a class="btn btn-bead btn-lg" href="/contact">Book a demo</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

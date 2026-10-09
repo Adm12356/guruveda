@@ -1,0 +1,23 @@
+<div class="row g-3">
+  <div class="col-12">
+    <label for="question_text" class="form-label">Question</label>
+    <textarea class="form-control" id="question_text" name="question_text" rows="2" required><%= q.question_text %></textarea>
+  </div>
+  <% ['a', 'b', 'c', 'd'].forEach(k => { %>
+    <div class="col-md-6">
+      <label for="option_<%= k %>" class="form-label">Option <%= k.toUpperCase() %></label>
+      <input type="text" class="form-control" id="option_<%= k %>" name="option_<%= k %>" value="<%= q['option_' + k] %>" required>
+    </div>
+  <% }) %>
+  <div class="col-md-4">
+    <label for="correct_option" class="form-label">Correct option</label>
+    <select class="form-select" id="correct_option" name="correct_option" required>
+      <option value="">Choose</option>
+      <% ['A', 'B', 'C', 'D'].forEach(o => { %><option value="<%= o %>" <%= q.correct_option === o ? 'selected' : '' %>><%= o %></option><% }) %>
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label for="marks" class="form-label">Marks</label>
+    <input type="number" min="1" max="100" class="form-control" id="marks" name="marks" value="<%= isNaN(q.marks) ? 1 : q.marks %>" required>
+  </div>
+</div>

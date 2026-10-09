@@ -1,0 +1,66 @@
+<%- include('partials/header') %>
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1">Questions: <%= exam.title %></h1>
+    <p class="text-muted mb-0"><%= exam.duration_minutes %> minute timer &middot; <%= exam.is_published ? 'Published' : 'Draft (not visible to students)' %></p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary" href="/admin/exams">Back to exams</a>
+    <form method="POST" action="/admin/exams/<%= exam.id %>/publish" class="m-0">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <button class="btn btn-success" type="submit"><%= exam.is_published ? 'Unpublish' : 'Publish exam' %></button>
+    </form>
+  </div>
+</div>
+
+<% if (locked) { %>
+  <div class="alert alert-warning">Students have already started this exam, so questions are locked. To change them, open <a href="/admin/exams/<%= exam.id %>/results">Results</a> and reset the attempts first.</div>
+<% } %>
+
+<div class="admin-card mb-4">
+  <h2 class="h5 mb-3"><%= questions.length %> question<%= questions.length === 1 ? '' : 's' %></h2>
+  <% if (questions.length === 0) { %>
+    <p class="text-muted mb-0">No questions yet. Add the first one below.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>#</th><th>Question</th><th>Options</th><th>Answer</th><th>Marks</th><% if (!locked) { %><th class="text-end">Actions</th><% } %></tr></thead>
+        <tbody>
+          <% questions.forEach((qq, i) => { %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td class="msg-text"><%= qq.question_text %></td>
+              <td><small>A. <%= qq.option_a %><br>B. <%= qq.option_b %><br>C. <%= qq.option_c %><br>D. <%= qq.option_d %></small></td>
+              <td><span class="badge text-bg-success"><%= qq.correct_option %></span></td>
+              <td><%= qq.marks %></td>
+              <% if (!locked) { %>
+              <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-outline-primary" href="/admin/exams/<%= exam.id %>/questions/<%= qq.id %>/edit">Edit</a>
+                <form method="POST" action="/admin/exams/<%= exam.id %>/questions/<%= qq.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this question?')">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                </form>
+              </td>
+              <% } %>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<% if (!locked) { %>
+<div class="admin-card" id="add">
+  <h2 class="h5 mb-3">Add a question</h2>
+  <% if (errors.length) { %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+  <form method="POST" action="/admin/exams/<%= exam.id %>/questions">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <%- include('partials/question-fields', { q }) %>
+    <button class="btn btn-primary mt-3" type="submit">Add question</button>
+  </form>
+</div>
+<% } %>
+<%- include('partials/footer') %>

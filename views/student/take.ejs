@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+<form id="examForm" method="POST" action="/student/exams/<%= exam.id %>/submit"
+      data-remaining="<%= remaining %>" data-save-url="/student/exams/<%= exam.id %>/save-answer" data-csrf="<%= csrf %>">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <input type="hidden" name="auto" value="0">
+
+  <div id="timerBar" class="timer-bar">
+    <div>
+      <strong><%= exam.title %></strong><br>
+      <small id="answeredCount"></small>
+    </div>
+    <div class="text-end">
+      <div class="timer-label">Time left</div>
+      <div id="timer" class="timer-value" role="timer" aria-live="off">--:--</div>
+    </div>
+  </div>
+
+  <div id="timeUp" class="alert alert-warning d-none" role="alert">Time is up. Submitting your answers...</div>
+
+  <% questions.forEach((q, i) => { %>
+    <fieldset class="admin-card q-block mb-3">
+      <legend class="h6 float-none"><span class="text-muted">Q<%= i + 1 %>.</span> <%= q.question_text %> <small class="text-muted">(<%= q.marks %> mark<%= q.marks === 1 ? '' : 's' %>)</small></legend>
+      <% ['A', 'B', 'C', 'D'].forEach(o => { %>
+        <div class="form-check py-1">
+          <input class="form-check-input" type="radio" name="q_<%= q.id %>" id="q<%= q.id %><%= o %>" value="<%= o %>" data-qid="<%= q.id %>" <%= answers[q.id] === o ? 'checked' : '' %>>
+          <label class="form-check-label" for="q<%= q.id %><%= o %>"><%= q['option_' + o.toLowerCase()] %></label>
+        </div>
+      <% }) %>
+    </fieldset>
+  <% }) %>
+
+  <button type="submit" class="btn btn-primary btn-lg mb-4">Submit exam</button>
+</form>
+<script src="/js/exam-timer.js"></script>
+<%- include('partials/footer') %>

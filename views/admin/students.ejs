@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h1 class="h3 mb-0">Students</h1>
+  <a class="btn btn-primary" href="/admin/students/new">Add student</a>
+</div>
+<div class="admin-card">
+  <% if (students.length === 0) { %>
+    <p class="text-muted mb-0">No students yet. Add a student to give them a login.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Name</th><th>Username</th><th>Batch</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+          <% students.forEach(s => { %>
+            <tr>
+              <td><%= s.name %></td>
+              <td><code><%= s.username %></code></td>
+              <td><%= s.batch_name || '-' %></td>
+              <td><span class="badge text-bg-<%= s.is_active ? 'success' : 'secondary' %>"><%= s.is_active ? 'Active' : 'Disabled' %></span></td>
+              <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-outline-primary" href="/admin/students/<%= s.id %>/edit">Edit</a>
+                <form method="POST" action="/admin/students/<%= s.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this student and all of their exam results?')">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

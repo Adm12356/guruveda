@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3">Edit question: <%= exam.title %></h1>
+<div class="admin-card">
+  <% if (errors.length) { %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+  <form method="POST" action="/admin/exams/<%= exam.id %>/questions/<%= q.id %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <%- include('partials/question-fields', { q }) %>
+    <button class="btn btn-primary mt-3" type="submit">Save changes</button>
+    <a class="btn btn-link mt-3" href="/admin/exams/<%= exam.id %>/questions">Cancel</a>
+  </form>
+</div>
+<%- include('partials/footer') %>
