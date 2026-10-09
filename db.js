@@ -12,4 +12,4 @@ const db = mysql.createPool({
     connectionLimit: 10
 });
 
-module.exports = ;
+module.exports = db;
