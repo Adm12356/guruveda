@@ -30,8 +30,110 @@
   </button>
 </div>
 
-<!-- Why abacus -->
+<!-- ABACUS meaning + what your child gains (two columns) -->
+<section class="section about-split">
+  <div class="container">
+    <div class="row g-4 g-lg-5">
+
+      <!-- Left: ABACUS -->
+      <div class="col-lg-6">
+        <div class="split-col">
+          <h2 class="section-title">What does ABACUS stand for?</h2>
+
+          <% const acronym = [
+            { 1: 'A', w: 'Abundant',    c: 'yellow', on: 'var(--ink)', t: 'Plenty of practice and fun in every class.' },
+            { 1: 'B', w: 'Beads',       c: 'teal',   on: '#fff',       t: 'Colourful beads children can touch, move and see.' },
+            { 1: 'A', w: 'Addition &',  c: 'coral',  on: '#fff',       t: 'A strong start with addition and subtraction.' },
+            { 1: 'C', w: 'Calculation', c: 'sky',    on: '#fff',       t: 'Multiplication, division and fast mental maths.' },
+            { 1: 'U', w: 'Utility',     c: 'yellow', on: 'var(--ink)', t: 'A skill for school, exams and daily life.' },
+            { 1: 'S', w: 'System',      c: 'teal',   on: '#fff',       t: 'Clear levels, exams and certificates.' }
+          ]; %>
+
+          <div class="acr-frame">
+            <ol class="acr-list">
+              <% acronym.forEach(function (r) { %>
+                <li class="acr-row" style="--c: var(--<%= r.c %>); --on: <%= r.on %>;">
+                  <span class="acr-letter" aria-hidden="true"><%= r.l %></span>
+                  <div class="acr-body">
+                    <h3><%= r.w %></h3>
+                    <p><%= r.t %></p>
+                  </div>
+                </li>
+              <% }) %>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: what your child gains -->
+      <div class="col-lg-6">
+        <div class="split-col">
+          <h2 class="section-title">What your child gains</h2>
+
+          <% const skills = [
+            ['Concentration',      'Timed practice teaches children to focus on one task.', 'yellow'],
+            ['Memory',             'Picturing the beads strengthens visual memory.',        'teal'],
+            ['Speed and accuracy', 'Quick, correct answers without a calculator.',          'coral'],
+            ['Visualisation',      'Children "see" the abacus in their mind.',              'sky'],
+            ['Listening',          'Oral drills build careful listening skills.',           'yellow'],
+            ['Confidence',         'Every level cleared builds belief in maths.',           'teal']
+          ]; %>
+
+          <div class="gain-list">
+            <% skills.forEach(function (s) { %>
+              <div class="skill" style="--c: var(--<%= s[2] %>);">
+                <h3 class="h6"><%= s[0] %></h3>
+                <p class="mb-0"><%= s[1] %></p>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Why parents choose us -->
 <section class="section">
+  <div class="container">
+    <div class="row g-4 g-lg-5 align-items-center">
+
+      <div class="col-lg-5">
+        <h2 class="section-title">Why parents choose us</h2>
+        <p class="lead">Enroll your child here and watch them grow stronger in maths and in life.</p>
+        <a class="btn btn-bead btn-lg" href="/contact">Enroll here</a>
+      </div>
+
+      <div class="col-lg-7">
+        <% const reasons = [
+          'Ability to multitask',
+          'Improved concentration',
+          'Enhanced memory power',
+          'More self-confidence',
+          'Better problem solving',
+          'Overall academic success',
+          'Mastery in arithmetic and number sense'
+        ];
+        const tones = [
+          ['yellow', 'var(--ink)'], ['teal', '#fff'], ['coral', '#fff'], ['sky', '#fff']
+        ]; %>
+        <ul class="pc-list">
+          <% reasons.forEach(function (text, i) { %>
+            <li class="pc-item" style="--c: var(--<%= tones[i % 4][0] %>); --on: <%= tones[i % 4][1] %>;">
+              <span class="pc-bead" aria-hidden="true"></span>
+              <span><%= text %></span>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Why abacus -->
+<!-- <section class="section">
   <div class="container">
     <h2 class="section-title">Why children learn abacus here</h2>
     <div class="row gy-4 why">
@@ -49,7 +151,7 @@
       </div>
     </div>
   </div>
-</section>
+</section> -->
 
 <!-- Upcoming events -->
 <section class="section section-tint">

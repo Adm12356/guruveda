@@ -125,8 +125,8 @@ a:focus-visible, button:focus-visible, .form-control:focus-visible, .form-select
 .carousel-indicators [data-bs-target] { box-sizing: content-box; width: 10px; height: 10px; border-radius: 50%; border: 12px solid transparent; background-clip: padding-box; margin: 0 -2px; }
 
 /* Why section: three columns divided by rules */
-.why > div + div { border-left: 1px solid var(--line); }
-@media (max-width: 767.98px) { .why > div + div { border-left: 0; } }
+/* .why > div + div { border-left: 1px solid var(--line); }
+@media (max-width: 767.98px) { .why > div + div { border-left: 0; } } */
 
 /* Events */
 .event-row {
@@ -250,4 +250,127 @@ html, body { overflow-x: hidden; }
   .cta-band .btn, .contact-submit, form .btn-bead.btn-lg { width: 100%; }
   .map-slot { min-height: 180px; }
   .photo-slot { border-radius: 14px; }
+}
+
+
+/* ---------- Two-column: ABACUS + gains ---------- */
+.about-split { background: var(--paper); }
+.split-col { display: flex; flex-direction: column; height: 100%; }
+
+/* left: compact abacus frame */
+.about-split .acr-frame {
+  flex: 1;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-width: 8px;
+  padding: .25rem 1.25rem;
+  display: flex;
+}
+.about-split .acr-list { display: flex; flex-direction: column; justify-content: space-between; width: 100%; }
+.about-split .acr-row {
+  grid-template-columns: 54px 1fr;   /* no rod in the narrow column */
+  gap: 1rem;
+  padding: .8rem 0;
+}
+.about-split .acr-letter { width: 54px; height: 54px; font-size: 1.7rem; }
+.about-split .acr-body h3 { font-size: 1.15rem; }
+.about-split .acr-body p { font-size: .95rem; }
+
+/* right: stacked skill cards that fill the same height */
+.gain-list { flex: 1; display: flex; flex-direction: column; gap: .75rem; }
+.gain-list .skill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (max-width: 767.98px) {
+  .about-split .acr-frame { border-width: 6px; padding: .15rem .9rem; }
+  .about-split .acr-row { grid-template-columns: 46px 1fr; gap: .8rem; }
+  .about-split .acr-letter { width: 46px; height: 46px; font-size: 1.45rem; }
+}
+
+/* ---------- Same border on both columns ---------- */
+.about-split .gain-list {
+  background: #fff;
+  border: 8px solid var(--ink);
+  border-radius: 22px;
+  padding: .25rem 1.25rem;
+  gap: 0;
+  box-shadow: 0 14px 30px rgba(27, 42, 91, .14);
+}
+
+/* inside the frame, show the skills as clean rows with dividers */
+.about-split .gain-list .skill {
+  background: transparent;
+  border: 0;
+  border-left: 6px solid var(--c);
+  border-radius: 0;
+  padding: .8rem 0 .8rem 1rem;
+}
+.about-split .gain-list .skill + .skill { border-top: 1px solid var(--line); }
+
+@media (max-width: 767.98px) {
+  .about-split .gain-list { border-width: 6px; padding: .15rem .9rem; }
+}
+
+
+/* ---------- Why parents choose us ---------- */
+.pc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .9rem 1.1rem;
+}
+.pc-item {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: .75rem 1rem .75rem .75rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  transition: transform .3s, box-shadow .3s;
+}
+.pc-item:hover {
+  transform: translateX(6px);
+  box-shadow: 0 8px 18px rgba(27, 42, 91, .12);
+}
+.pc-item:last-child { grid-column: 1 / -1; }   /* 7th point spans the full width */
+
+.pc-bead {
+  position: relative;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .12);
+}
+.pc-bead::after {                               /* tick mark */
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 8px;
+  width: 8px;
+  height: 16px;
+  border: solid var(--on);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+@media (max-width: 767.98px) {
+  .pc-list { grid-template-columns: 1fr; }
+  .pc-item:hover { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-item { transition: none; }
 }
