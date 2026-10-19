@@ -1,0 +1,29 @@
+<%# Shared month calendar. Needs: cal (from buildMonth) and calBase (page url). %>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <a class="btn btn-sm btn-outline-primary" href="<%= calBase %>?month=<%= cal.prev %>">&larr; Prev</a>
+  <h2 class="h5 mb-0"><%= cal.label %></h2>
+  <% if (cal.next) { %>
+    <a class="btn btn-sm btn-outline-primary" href="<%= calBase %>?month=<%= cal.next %>">Next &rarr;</a>
+  <% } else { %>
+    <span class="btn btn-sm btn-outline-secondary disabled">Next &rarr;</span>
+  <% } %>
+</div>
+<div class="cal-grid" role="table" aria-label="Attendance calendar for <%= cal.label %>">
+  <% ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => { %><div class="cal-dow"><%= d %></div><% }) %>
+  <% for (let i = 0; i < cal.lead; i++) { %><div></div><% } %>
+  <% cal.cells.forEach(c => { %>
+    <div class="cal-cell cal-<%= c.status %><%= c.isToday ? ' cal-today' : '' %>" title="<%= c.note || ({ present: 'Present', absent: 'Absent', none: 'Not marked', future: '', holiday: 'Holiday' })[c.status] %>">
+      <span class="cal-num"><%= c.day %></span>
+      <span class="cal-tag"><%= ({ present: 'P', absent: 'A', holiday: 'H' })[c.status] || '' %></span>
+    </div>
+  <% }) %>
+</div>
+<div class="cal-legend mt-3">
+  <span><i class="cal-dot cal-present"></i> Present</span>
+  <span><i class="cal-dot cal-absent"></i> Absent</span>
+  <span><i class="cal-dot cal-holiday"></i> Holiday</span>
+  <span><i class="cal-dot cal-none"></i> Not marked</span>
+</div>
+<% const hols = cal.cells.filter(c => c.status === 'holiday'); if (hols.length) { %>
+  <p class="small text-muted mt-3 mb-0"><strong>Holidays:</strong> <%= hols.map(h => h.day + ' ' + cal.label.split(' ')[0].slice(0, 3) + (h.note && h.note !== 'Holiday' ? ' (' + h.note + ')' : '')).join(', ') %></p>
+<% } %>

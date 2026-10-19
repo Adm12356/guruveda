@@ -6,6 +6,8 @@
   <div class="col-md-4"><a class="text-decoration-none" href="/student/exams"><div class="admin-card"><div class="stat"><%= pending %></div><div class="text-muted">Exams to take</div></div></a></div>
   <div class="col-md-4"><a class="text-decoration-none" href="/student/results"><div class="admin-card"><div class="stat"><%= done %></div><div class="text-muted">Exams completed</div></div></a></div>
   <div class="col-md-4"><div class="admin-card"><div class="stat"><%= avg === null ? '-' : avg + '%' %></div><div class="text-muted">Average of recent results</div></div></div>
+  <div class="col-md-6"><a class="text-decoration-none" href="/student/attendance"><div class="admin-card"><div class="stat"><%= attTotal.percent === null ? '-' : attTotal.percent + '%' %></div><div class="text-muted">Attendance (<%= attTotal.present %> present, <%= attTotal.absent %> absent)</div></div></a></div>
+  <div class="col-md-6"><a class="text-decoration-none" href="/student/attendance"><div class="admin-card"><div class="stat fs-3"><%= ({ present: 'Present', absent: 'Absent', holiday: 'Holiday', none: 'Not marked yet' })[attToday.status] %></div><div class="text-muted">Today<%= attToday.status === 'holiday' && attToday.note && attToday.note !== 'Holiday' ? ' - ' + attToday.note : '' %></div></div></a></div>
 </div>
 
 <% if (!student.batch_name) { %>

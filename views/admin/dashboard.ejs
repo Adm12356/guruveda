@@ -1,10 +1,21 @@
 <%- include('partials/header') %>
-<h1 class="h3 mb-4">Dashboard</h1>
+<h1 class="h3 mb-1">Welcome, <%= admin.name || admin.username %></h1>
+<p class="text-muted mb-4"><%= isOwner ? 'Main account of the institute' : 'Teacher account' %></p>
 
+<h2 class="h5 mb-3"><%= isOwner ? 'Your own classes' : 'Your classes' %></h2>
 <div class="row g-3 mb-4">
-  <div class="col-md-4"><a class="text-decoration-none" href="/admin/events"><div class="admin-card"><div class="stat"><%= counts.events %></div><div class="text-muted">Upcoming events</div></div></a></div>
-  <div class="col-md-4"><a class="text-decoration-none" href="/admin/batches"><div class="admin-card"><div class="stat"><%= counts.batches %></div><div class="text-muted">Active batches</div></div></a></div>
-  <div class="col-md-4"><a class="text-decoration-none" href="/admin/messages"><div class="admin-card"><div class="stat"><%= counts.messages %></div><div class="text-muted">Messages received</div></div></a></div>
+  <div class="col-md-4"><a class="text-decoration-none" href="/admin/batches"><div class="admin-card"><div class="stat"><%= mine.batches %></div><div class="text-muted">Active batches</div></div></a></div>
+  <div class="col-md-4"><a class="text-decoration-none" href="/admin/students"><div class="admin-card"><div class="stat"><%= mine.students %></div><div class="text-muted">Students</div></div></a></div>
+  <div class="col-md-4"><a class="text-decoration-none" href="/admin/exams"><div class="admin-card"><div class="stat"><%= mine.exams %></div><div class="text-muted">Exams</div></div></a></div>
+</div>
+
+<% if (site) { %>
+<h2 class="h5 mb-3">Whole institute</h2>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><a class="text-decoration-none" href="/admin/teachers"><div class="admin-card"><div class="stat"><%= site.teachers %></div><div class="text-muted">Active teachers</div></div></a></div>
+  <div class="col-6 col-lg-3"><a class="text-decoration-none" href="/admin/teachers"><div class="admin-card"><div class="stat"><%= site.students %></div><div class="text-muted">Students in total</div></div></a></div>
+  <div class="col-6 col-lg-3"><a class="text-decoration-none" href="/admin/events"><div class="admin-card"><div class="stat"><%= site.events %></div><div class="text-muted">Upcoming events</div></div></a></div>
+  <div class="col-6 col-lg-3"><a class="text-decoration-none" href="/admin/messages"><div class="admin-card"><div class="stat"><%= site.messages %></div><div class="text-muted">Messages received</div></div></a></div>
 </div>
 
 <div class="admin-card">
@@ -12,14 +23,14 @@
     <h2 class="h5 mb-0">Latest messages</h2>
     <a href="/admin/messages">View all</a>
   </div>
-  <% if (recent.length === 0) { %>
+  <% if (site.recent.length === 0) { %>
     <p class="text-muted mb-0">No messages yet.</p>
   <% } else { %>
     <div class="table-responsive">
       <table class="table mb-0 table-stack">
         <thead><tr><th>Date</th><th>Name</th><th>Phone</th><th>Batch</th></tr></thead>
         <tbody>
-          <% recent.forEach(m => { %>
+          <% site.recent.forEach(m => { %>
             <tr>
               <td><%= new Date(m.created_at).toLocaleString('en-IN') %></td>
               <td><%= m.name %></td>
@@ -32,4 +43,5 @@
     </div>
   <% } %>
 </div>
+<% } %>
 <%- include('partials/footer') %>

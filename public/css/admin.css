@@ -25,6 +25,21 @@ body { background: #f4f6fb; font-family: system-ui, -apple-system, 'Segoe UI', s
 .timer-low .timer-value { color: #e8505b; }
 fieldset.q-block legend { width: 100%; }
 
+/* Attendance calendar */
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .35rem; }
+.cal-dow { text-align: center; font-size: .75rem; font-weight: 600; color: #5a6683; padding-bottom: .15rem; }
+.cal-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 54px; border-radius: 10px; border: 1px solid #e3e8f6; background: #f8f9fd; color: #5a6683; }
+.cal-num { font-size: .9rem; font-weight: 600; line-height: 1.1; }
+.cal-tag { font-size: .7rem; font-weight: 700; line-height: 1.1; min-height: .8rem; }
+.cal-present { background: #d9f2e1; border-color: #9bd6ae; color: #14602e; }
+.cal-absent { background: #fde0e2; border-color: #f2a6ac; color: #9b1c27; }
+.cal-holiday { background: #fff1c9; border-color: #f0cf72; color: #7a5a00; }
+.cal-future { background: #fff; color: #b3bbcf; }
+.cal-today { outline: 2px solid #1b2a5b; outline-offset: 1px; }
+.cal-legend { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; font-size: .85rem; color: #5a6683; }
+.cal-dot { display: inline-block; width: .8rem; height: .8rem; border-radius: 4px; border: 1px solid #e3e8f6; vertical-align: -1px; }
+.cal-dot.cal-none { background: #f8f9fd; }
+
 /* ---------- Mobile ---------- */
 .admin-nav .nav-link { padding-top: .6rem; padding-bottom: .6rem; }
 
@@ -47,6 +62,8 @@ fieldset.q-block legend { width: 100%; }
   .admin-card form .btn-link { display: block; text-align: center; }
   .login-wrap { margin-top: 6vh; }
   .stat { font-size: 1.8rem; }
+  .cal-cell { min-height: 44px; border-radius: 8px; }
+  .cal-grid { gap: .25rem; }
 
   /* tables become cards */
   .table-stack.is-stacked thead { display: none; }

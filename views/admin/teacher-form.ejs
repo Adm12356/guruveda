@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3"><%= isEdit ? 'Edit teacher' : 'Add teacher' %></h1>
+<div class="admin-card">
+  <% if (errors.length) { %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+  <form method="POST" action="<%= action %>" autocomplete="off">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="name" class="form-label">Teacher name</label>
+        <input type="text" class="form-control" id="name" name="name" value="<%= t.name %>" required>
+      </div>
+      <div class="col-md-6">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username" name="username" value="<%= t.username %>" required>
+      </div>
+      <div class="col-md-6">
+        <label for="password" class="form-label"><%= isEdit ? 'New password (leave blank to keep the current one)' : 'Password' %></label>
+        <input type="text" class="form-control" id="password" name="password" <%= isEdit ? '' : 'required' %> minlength="8">
+        <div class="form-text">At least 8 characters. Share it with the teacher; they can change it later from their account page.</div>
+      </div>
+      <% if (!(isEdit && t.role === 'owner')) { %>
+      <div class="col-12">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <%= t.is_active ? 'checked' : '' %>>
+          <label class="form-check-label" for="is_active">Account is active (can log in)</label>
+        </div>
+        <div class="form-text">Switching a teacher off blocks their login but keeps all their students, exams and attendance.</div>
+      </div>
+      <% } %>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit"><%= isEdit ? 'Save changes' : 'Add teacher' %></button>
+        <a class="btn btn-link" href="/admin/teachers">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+<%- include('partials/footer') %>

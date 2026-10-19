@@ -11,7 +11,7 @@
       </div>
       <div class="col-lg-6">
         <!-- Add public/images/about/class.jpg to replace the placeholder -->
-        <div class="photo-slot" style="--img: url('/images/about/class.jpg');" role="img" aria-label="Students in an abacus class"></div>
+        <div class="photo-slot" style="--img: url('/images/about/story.jpeg');" role="img" aria-label="Students in an abacus class"></div>
       </div>
     </div>
   </div>
@@ -29,10 +29,52 @@
   </div>
 </section>
 
+<!-- Our trainers -->
 <section class="section">
   <div class="container">
-    <h2 class="section-title">Our trainers</h2>
-    <p>Add your trainers' names, qualifications and experience here.</p>
+    <h2 class="section-title" style="text-align: center;">Founded and Managed By</h2>
+
+    <% const trainers = [
+      {
+        name: 'Sandhya Shinde Patil',
+        initials: 'SP',
+        photo: 'sandhya.jpeg',
+        role: 'Abacus Trainer',
+        qualification: 'M.A. ,B.Ed, DSM , Certified Abacus, phonics, Vedic teacher ',
+        experience: '6 Years',
+        tone: 'yellow'
+      },
+      {
+        name: 'Rupali Kale',
+        initials: 'RK',
+        photo: 'rupali.jpeg',
+        role: 'Abacus Trainer',
+        qualification: 'MSc (maths)',
+        experience: '5 Years',
+        tone: 'teal'
+      }
+    ]; %>
+
+    <div class="row g-4 justify-content-center">
+      <% trainers.forEach(function (t) { %>
+        <div class="col-md-6 col-lg-5">
+          <article class="trainer-card" style="--c: var(--<%= t.tone %>);">
+            <div class="trainer-photo">
+              <span class="trainer-initials" aria-hidden="true"><%= t.initials %></span>
+              <img src="/images/about/<%= t.photo %>" alt="<%= t.name %>" loading="lazy" onerror="this.style.display='none'">
+            </div>
+            <div class="trainer-info">
+              <h3 class="h4"><%= t.name %></h3>
+              <p class="trainer-role"><%= t.role %></p>
+              <dl class="trainer-facts">
+                <dt>Qualification</dt><dd><%= t.qualification %></dd>
+                <dt>Experience</dt><dd><%= t.experience %></dd>
+              </dl>
+            </div>
+          </article>
+        </div>
+      <% }) %>
+    </div>
   </div>
 </section>
 

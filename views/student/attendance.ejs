@@ -1,0 +1,16 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3">My attendance</h1>
+<div class="alert alert-<%= today.status === 'present' ? 'success' : (today.status === 'absent' ? 'danger' : (today.status === 'holiday' ? 'warning' : 'secondary')) %>">
+  Today:
+  <strong><%= ({ present: 'Present', absent: 'Absent', holiday: 'Holiday' + (today.note && today.note !== 'Holiday' ? ' - ' + today.note : ''), none: 'Not marked yet' })[today.status] %></strong>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="admin-card"><div class="stat"><%= cal.counts.present %></div><div class="text-muted">Present (this month)</div></div></div>
+  <div class="col-6 col-lg-3"><div class="admin-card"><div class="stat"><%= cal.counts.absent %></div><div class="text-muted">Absent (this month)</div></div></div>
+  <div class="col-6 col-lg-3"><div class="admin-card"><div class="stat"><%= cal.percent === null ? '-' : cal.percent + '%' %></div><div class="text-muted">This month</div></div></div>
+  <div class="col-6 col-lg-3"><div class="admin-card"><div class="stat"><%= total.percent === null ? '-' : total.percent + '%' %></div><div class="text-muted">Overall</div></div></div>
+</div>
+<div class="admin-card">
+  <%- include('../partials/attendance-calendar') %>
+</div>
+<%- include('partials/footer') %>

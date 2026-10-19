@@ -172,21 +172,6 @@
   </div>
 </section>
 
-<!-- Batches -->
-<section class="section">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
-      <h2 class="section-title mb-0">Find a batch for your child</h2>
-      <a href="/batches" class="link-strong">All batches</a>
-    </div>
-    <div class="row g-4">
-      <% batches.forEach(b => { %>
-        <div class="col-md-4"><%- include('partials/batch-card', { b }) %></div>
-      <% }) %>
-    </div>
-  </div>
-</section>
-
 <!-- Call to action -->
 <section class="cta-band">
   <div class="container text-center">

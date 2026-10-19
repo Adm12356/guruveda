@@ -9,7 +9,10 @@ const router = express.Router();
 const OPTIONS = ['A', 'B', 'C', 'D'];
 const fail = (req, text) => { req.session.flash = { type: 'danger', text }; };
 const ok = (req, text) => { req.session.flash = { type: 'success', text }; };
-const allBatches = async () => (await db.query('SELECT id, name FROM batches ORDER BY name'))[0];
+// Every batch, student and exam belongs to the account that created it.
+const allBatches = async adminId => (await db.query('SELECT id, name FROM batches WHERE admin_id = ? ORDER BY name', [adminId]))[0];
+const ownsBatch = async (adminId, batchId) => !!batchId && (await db.query('SELECT 1 FROM batches WHERE id = ? AND admin_id = ?', [batchId, adminId]))[0].length > 0;
+const ownsStudent = async (adminId, id) => (await db.query('SELECT 1 FROM students WHERE id = ? AND admin_id = ?', [id, adminId]))[0].length > 0;
 
 /* =====================  STUDENTS  ===================== */
 const parseStudent = b => ({
@@ -28,19 +31,19 @@ function studentErrors(s, isNew) {
   if (!s.batch_id) e.push('Please choose a batch.');
   return e;
 }
-const studentForm = async (res, status, o) => res.status(status).render('admin/student-form', { batches: await allBatches(), ...o });
+const studentForm = async (req, res, status, o) => res.status(status).render('admin/student-form', { batches: await allBatches(req.admin.id), ...o });
 
 router.get('/students', async (req, res, next) => {
   try {
     const [students] = await db.query(
-      'SELECT s.*, b.name AS batch_name FROM students s LEFT JOIN batches b ON b.id = s.batch_id ORDER BY s.name');
+      'SELECT s.*, b.name AS batch_name FROM students s LEFT JOIN batches b ON b.id = s.batch_id WHERE s.admin_id = ? ORDER BY s.name', [req.admin.id]);
     res.render('admin/students', { title: 'Students', students });
   } catch (err) { next(err); }
 });
 
 router.get('/students/new', async (req, res, next) => {
   try {
-    await studentForm(res, 200, { title: 'Add student', s: { name: '', username: '', batch_id: null, is_active: 1 }, errors: [], action: '/admin/students', isEdit: false });
+    await studentForm(req, res, 200, { title: 'Add student', s: { name: '', username: '', batch_id: null, is_active: 1 }, errors: [], action: '/admin/students', isEdit: false });
   } catch (err) { next(err); }
 });
 
@@ -48,12 +51,13 @@ router.post('/students', async (req, res, next) => {
   try {
     const s = parseStudent(req.body);
     const errors = studentErrors(s, true);
-    if (errors.length) return studentForm(res, 400, { title: 'Add student', s, errors, action: '/admin/students', isEdit: false });
+    if (s.batch_id && !(await ownsBatch(req.admin.id, s.batch_id))) errors.push('Please choose one of your own batches.');
+    if (errors.length) return studentForm(req, res, 400, { title: 'Add student', s, errors, action: '/admin/students', isEdit: false });
     try {
-      await db.query('INSERT INTO students (name, username, password_hash, batch_id, is_active) VALUES (?, ?, ?, ?, ?)',
-        [s.name, s.username, await bcrypt.hash(s.password, 10), s.batch_id, s.is_active]);
+      await db.query('INSERT INTO students (admin_id, name, username, password_hash, batch_id, is_active) VALUES (?, ?, ?, ?, ?, ?)',
+        [req.admin.id, s.name, s.username, await bcrypt.hash(s.password, 10), s.batch_id, s.is_active]);
     } catch (e) {
-      if (e.code === 'ER_DUP_ENTRY') return studentForm(res, 400, { title: 'Add student', s, errors: ['That username is already taken.'], action: '/admin/students', isEdit: false });
+      if (e.code === 'ER_DUP_ENTRY') return studentForm(req, res, 400, { title: 'Add student', s, errors: ['That username is already taken.'], action: '/admin/students', isEdit: false });
       throw e;
     }
     ok(req, 'Student added.');
@@ -63,18 +67,20 @@ router.post('/students', async (req, res, next) => {
 
 router.get('/students/:id/edit', async (req, res, next) => {
   try {
-    const [rows] = await db.query('SELECT * FROM students WHERE id = ?', [req.params.id]);
+    const [rows] = await db.query('SELECT * FROM students WHERE id = ? AND admin_id = ?', [req.params.id, req.admin.id]);
     if (!rows.length) return res.redirect('/admin/students');
-    await studentForm(res, 200, { title: 'Edit student', s: rows[0], errors: [], action: `/admin/students/${rows[0].id}`, isEdit: true });
+    await studentForm(req, res, 200, { title: 'Edit student', s: rows[0], errors: [], action: `/admin/students/${rows[0].id}`, isEdit: true });
   } catch (err) { next(err); }
 });
 
 router.post('/students/:id', async (req, res, next) => {
   try {
+    if (!(await ownsStudent(req.admin.id, req.params.id))) return res.redirect('/admin/students');
     const s = parseStudent(req.body);
     const action = `/admin/students/${req.params.id}`;
     const errors = studentErrors(s, false);
-    if (errors.length) return studentForm(res, 400, { title: 'Edit student', s, errors, action, isEdit: true });
+    if (s.batch_id && !(await ownsBatch(req.admin.id, s.batch_id))) errors.push('Please choose one of your own batches.');
+    if (errors.length) return studentForm(req, res, 400, { title: 'Edit student', s, errors, action, isEdit: true });
     try {
       if (s.password) {
         await db.query('UPDATE students SET name=?, username=?, batch_id=?, is_active=?, password_hash=? WHERE id=?',
@@ -84,7 +90,7 @@ router.post('/students/:id', async (req, res, next) => {
           [s.name, s.username, s.batch_id, s.is_active, req.params.id]);
       }
     } catch (e) {
-      if (e.code === 'ER_DUP_ENTRY') return studentForm(res, 400, { title: 'Edit student', s, errors: ['That username is already taken.'], action, isEdit: true });
+      if (e.code === 'ER_DUP_ENTRY') return studentForm(req, res, 400, { title: 'Edit student', s, errors: ['That username is already taken.'], action, isEdit: true });
       throw e;
     }
     ok(req, 'Student updated.');
@@ -94,13 +100,22 @@ router.post('/students/:id', async (req, res, next) => {
 
 router.post('/students/:id/delete', async (req, res, next) => {
   try {
-    await db.query('DELETE FROM students WHERE id = ?', [req.params.id]);
+    await db.query('DELETE FROM students WHERE id = ? AND admin_id = ?', [req.params.id, req.admin.id]);
     ok(req, 'Student deleted along with their exam results.');
     res.redirect('/admin/students');
   } catch (err) { next(err); }
 });
 
 /* =====================  EXAMS  ===================== */
+// Any /exams/<id>/... page (questions, results, edit...) only opens for the exam's own teacher.
+router.use('/exams/:id', async (req, res, next) => {
+  try {
+    if (!/^\d+$/.test(req.params.id)) return next(); // e.g. /exams/new
+    const [r] = await db.query('SELECT 1 FROM exams WHERE id = ? AND admin_id = ?', [req.params.id, req.admin.id]);
+    if (!r.length) { fail(req, 'That exam was not found.'); return res.redirect('/admin/exams'); }
+    next();
+  } catch (err) { next(err); }
+});
 const parseExam = b => ({
   title: (b.title || '').trim(),
   description: (b.description || '').trim(),
@@ -118,7 +133,7 @@ function examErrors(x) {
   if (isNaN(x.pass_percent) || x.pass_percent < 0 || x.pass_percent > 100) e.push('Pass percentage must be between 0 and 100.');
   return e;
 }
-const examForm = async (res, status, o) => res.status(status).render('admin/exam-form', { batches: await allBatches(), ...o });
+const examForm = async (req, res, status, o) => res.status(status).render('admin/exam-form', { batches: await allBatches(req.admin.id), ...o });
 const attemptCount = async examId => (await db.query('SELECT COUNT(*) AS n FROM exam_attempts WHERE exam_id = ?', [examId]))[0][0].n;
 
 router.get('/exams', async (req, res, next) => {
@@ -128,14 +143,14 @@ router.get('/exams', async (req, res, next) => {
               (SELECT COUNT(*) FROM questions q WHERE q.exam_id = e.id) AS question_count,
               (SELECT COALESCE(SUM(marks), 0) FROM questions q WHERE q.exam_id = e.id) AS total_marks,
               (SELECT COUNT(*) FROM exam_attempts a WHERE a.exam_id = e.id AND a.status <> 'in_progress') AS submitted_count
-         FROM exams e JOIN batches b ON b.id = e.batch_id ORDER BY e.created_at DESC`);
+         FROM exams e JOIN batches b ON b.id = e.batch_id WHERE e.admin_id = ? ORDER BY e.created_at DESC`, [req.admin.id]);
     res.render('admin/exams', { title: 'Exams', exams });
   } catch (err) { next(err); }
 });
 
 router.get('/exams/new', async (req, res, next) => {
   try {
-    await examForm(res, 200, { title: 'Add exam', x: { title: '', description: '', batch_id: null, duration_minutes: 30, pass_percent: 40, show_answers: 1, is_published: 0 }, errors: [], action: '/admin/exams', isEdit: false });
+    await examForm(req, res, 200, { title: 'Add exam', x: { title: '', description: '', batch_id: null, duration_minutes: 30, pass_percent: 40, show_answers: 1, is_published: 0 }, errors: [], action: '/admin/exams', isEdit: false });
   } catch (err) { next(err); }
 });
 
@@ -143,10 +158,11 @@ router.post('/exams', async (req, res, next) => {
   try {
     const x = parseExam(req.body);
     const errors = examErrors(x);
-    if (errors.length) return examForm(res, 400, { title: 'Add exam', x, errors, action: '/admin/exams', isEdit: false });
+    if (x.batch_id && !(await ownsBatch(req.admin.id, x.batch_id))) errors.push('Please choose one of your own batches.');
+    if (errors.length) return examForm(req, res, 400, { title: 'Add exam', x, errors, action: '/admin/exams', isEdit: false });
     const [r] = await db.query(
-      'INSERT INTO exams (title, description, batch_id, duration_minutes, pass_percent, show_answers, is_published) VALUES (?, ?, ?, ?, ?, ?, 0)',
-      [x.title, x.description || null, x.batch_id, x.duration_minutes, x.pass_percent, x.show_answers]);
+      'INSERT INTO exams (admin_id, title, description, batch_id, duration_minutes, pass_percent, show_answers, is_published) VALUES (?, ?, ?, ?, ?, ?, ?, 0)',
+      [req.admin.id, x.title, x.description || null, x.batch_id, x.duration_minutes, x.pass_percent, x.show_answers]);
     ok(req, 'Exam created. Now add its questions, then publish it.');
     res.redirect(`/admin/exams/${r.insertId}/questions`);
   } catch (err) { next(err); }
@@ -156,7 +172,7 @@ router.get('/exams/:id/edit', async (req, res, next) => {
   try {
     const [rows] = await db.query('SELECT * FROM exams WHERE id = ?', [req.params.id]);
     if (!rows.length) return res.redirect('/admin/exams');
-    await examForm(res, 200, { title: 'Edit exam', x: rows[0], errors: [], action: `/admin/exams/${rows[0].id}`, isEdit: true });
+    await examForm(req, res, 200, { title: 'Edit exam', x: rows[0], errors: [], action: `/admin/exams/${rows[0].id}`, isEdit: true });
   } catch (err) { next(err); }
 });
 
@@ -164,7 +180,8 @@ router.post('/exams/:id', async (req, res, next) => {
   try {
     const x = parseExam(req.body);
     const errors = examErrors(x);
-    if (errors.length) return examForm(res, 400, { title: 'Edit exam', x, errors, action: `/admin/exams/${req.params.id}`, isEdit: true });
+    if (x.batch_id && !(await ownsBatch(req.admin.id, x.batch_id))) errors.push('Please choose one of your own batches.');
+    if (errors.length) return examForm(req, res, 400, { title: 'Edit exam', x, errors, action: `/admin/exams/${req.params.id}`, isEdit: true });
     if (x.is_published) {
       const [[q]] = await db.query('SELECT COUNT(*) AS n FROM questions WHERE exam_id = ?', [req.params.id]);
       if (!q.n) { x.is_published = 0; fail(req, 'The exam was saved but not published, because it has no questions yet.'); }

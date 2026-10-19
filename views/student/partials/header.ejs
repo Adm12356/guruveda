@@ -18,7 +18,7 @@
     </button>
     <div class="collapse navbar-collapse" id="studentMenu">
       <ul class="navbar-nav me-auto">
-        <% [['/student', 'Dashboard'], ['/student/exams', 'Exams'], ['/student/results', 'My results']].forEach(l => { %>
+        <% [['/student', 'Dashboard'], ['/student/exams', 'Exams'], ['/student/attendance', 'Attendance'], ['/student/results', 'My results']].forEach(l => { %>
           <li class="nav-item"><a class="nav-link <%= (l[0] === '/student' ? currentPath === '/student' || currentPath === '/student/' : currentPath.startsWith(l[0])) ? 'active' : '' %>" href="<%= l[0] %>"><%= l[1] %></a></li>
         <% }) %>
       </ul>

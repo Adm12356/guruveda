@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const db = require('../db');
 const ex = require('../lib/exams');
+const att = require('../lib/attendance');
 const router = express.Router();
 
 const OPTIONS = ['A', 'B', 'C', 'D'];
@@ -111,7 +112,20 @@ router.get('/', async (req, res, next) => {
       `SELECT a.*, e.title, e.pass_percent FROM exam_attempts a JOIN exams e ON e.id = a.exam_id
         WHERE a.student_id = ? AND a.status <> 'in_progress' ORDER BY a.submitted_at DESC LIMIT 5`, [sid]);
     const avg = recent.length ? Math.round(recent.reduce((t, r) => t + (r.total_marks ? r.score * 100 / r.total_marks : 0), 0) / recent.length) : null;
-    res.render('student/dashboard', { title: 'Dashboard', pending, done, recent, avg });
+    const attTotal = await att.overall(db, sid);
+    const attToday = await att.todayStatus(db, sid);
+    res.render('student/dashboard', { title: 'Dashboard', pending, done, recent, avg, attTotal, attToday });
+  } catch (err) { next(err); }
+});
+
+/* ---------- attendance (read-only for students) ---------- */
+router.get('/attendance', async (req, res, next) => {
+  try {
+    const month = att.isMonth(req.query.month) && req.query.month <= att.thisMonth() ? req.query.month : att.thisMonth();
+    const cal = await att.buildMonth(db, req.student.id, month);
+    const total = await att.overall(db, req.student.id);
+    const today = await att.todayStatus(db, req.student.id);
+    res.render('student/attendance', { title: 'My attendance', cal, total, today, calBase: '/student/attendance' });
   } catch (err) { next(err); }
 });
 

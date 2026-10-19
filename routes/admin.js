@@ -37,6 +37,7 @@ router.use((req, res, next) => {
   if (!req.session.csrf) req.session.csrf = crypto.randomBytes(24).toString('hex');
   res.locals.csrf = req.session.csrf;
   res.locals.admin = req.session.admin || null;
+  res.locals.isOwner = false;
   res.set('Cache-Control', 'no-store');
   next();
 });
@@ -46,7 +47,20 @@ router.use((req, res, next) => {
   }
   next();
 });
-const requireAuth = (req, res, next) => (req.session.admin ? next() : res.redirect('/admin/login'));
+// Loads the account fresh on every request, so a deactivated teacher is locked out immediately.
+const requireAuth = async (req, res, next) => {
+  try {
+    if (!req.session.admin) return res.redirect('/admin/login');
+    const [rows] = await db.query('SELECT id, username, name, role FROM admins WHERE id = ? AND is_active = 1', [req.session.admin.id]);
+    if (!rows.length) return req.session.destroy(() => res.redirect('/admin/login'));
+    req.admin = rows[0];
+    res.locals.admin = rows[0];
+    res.locals.isOwner = rows[0].role === 'owner';
+    next();
+  } catch (err) { next(err); }
+};
+const requireOwner = (req, res, next) => (req.admin.role === 'owner' ? next()
+  : res.status(403).render('error', { title: 'Not allowed', heading: 'Owner only', message: 'This page is only available to the main account of the institute.' }));
 
 /* ---------- login / logout ---------- */
 router.get('/login', (req, res) => {
@@ -60,7 +74,7 @@ router.post('/login', async (req, res, next) => {
   try {
     const username = (req.body.username || '').trim();
     const password = req.body.password || '';
-    const [rows] = await db.query('SELECT * FROM admins WHERE username = ?', [username]);
+    const [rows] = await db.query('SELECT * FROM admins WHERE username = ? AND is_active = 1', [username]);
     const ok = rows.length && await bcrypt.compare(password, rows[0].password_hash);
     if (!ok) {
       recordFail(ip);
@@ -86,15 +100,46 @@ router.use(requireAuth);
 /* ---------- dashboard ---------- */
 router.get('/', async (req, res, next) => {
   try {
-    const [[ev]] = await db.query('SELECT COUNT(*) AS n FROM events WHERE event_date >= NOW()');
-    const [[ba]] = await db.query('SELECT COUNT(*) AS n FROM batches WHERE is_active = 1');
-    const [[me]] = await db.query('SELECT COUNT(*) AS n FROM contact_messages');
-    const [recent] = await db.query('SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 5');
-    res.render('admin/dashboard', { title: 'Dashboard', counts: { events: ev.n, batches: ba.n, messages: me.n }, recent });
+    const id = req.admin.id;
+    const count = async (sql, params = []) => (await db.query(sql, params))[0][0].n;
+    const mine = {
+      batches: await count('SELECT COUNT(*) AS n FROM batches WHERE admin_id = ? AND is_active = 1', [id]),
+      students: await count('SELECT COUNT(*) AS n FROM students WHERE admin_id = ?', [id]),
+      exams: await count('SELECT COUNT(*) AS n FROM exams WHERE admin_id = ?', [id])
+    };
+    let site = null;
+    if (req.admin.role === 'owner') {
+      site = {
+        teachers: await count("SELECT COUNT(*) AS n FROM admins WHERE role = 'teacher' AND is_active = 1"),
+        students: await count('SELECT COUNT(*) AS n FROM students'),
+        events: await count('SELECT COUNT(*) AS n FROM events WHERE event_date >= NOW()'),
+        messages: await count('SELECT COUNT(*) AS n FROM contact_messages'),
+        recent: (await db.query('SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 5'))[0]
+      };
+    }
+    res.render('admin/dashboard', { title: 'Dashboard', mine, site });
   } catch (err) { next(err); }
 });
 
-/* ---------- events ---------- */
+/* ---------- my account (change own password) ---------- */
+router.get('/account', (req, res) => res.render('admin/account', { title: 'My account', errors: [] }));
+router.post('/account', async (req, res, next) => {
+  try {
+    const { current = '', password = '', confirm = '' } = req.body;
+    const errors = [];
+    const [rows] = await db.query('SELECT password_hash FROM admins WHERE id = ?', [req.admin.id]);
+    if (!(await bcrypt.compare(current, rows[0].password_hash))) errors.push('Your current password is not correct.');
+    if (password.length < 8) errors.push('New password must be at least 8 characters.');
+    if (password !== confirm) errors.push('The two new passwords do not match.');
+    if (errors.length) return res.status(400).render('admin/account', { title: 'My account', errors });
+    await db.query('UPDATE admins SET password_hash = ? WHERE id = ?', [await bcrypt.hash(password, 10), req.admin.id]);
+    req.session.flash = { type: 'success', text: 'Password changed.' };
+    res.redirect('/admin/account');
+  } catch (err) { next(err); }
+});
+
+/* ---------- events (website content: owner only) ---------- */
+router.use('/events', requireOwner);
 const parseEvent = b => ({
   title: (b.title || '').trim(),
   description: (b.description || '').trim(),
@@ -201,7 +246,7 @@ const blankBatch = { name: '', level: '', age_group: '', days: '', timing: '', m
 
 router.get('/batches', async (req, res, next) => {
   try {
-    const [batches] = await db.query('SELECT * FROM batches ORDER BY id ASC');
+    const [batches] = await db.query('SELECT * FROM batches WHERE admin_id = ? ORDER BY id ASC', [req.admin.id]);
     res.render('admin/batches', { title: 'Batches', batches });
   } catch (err) { next(err); }
 });
@@ -215,8 +260,8 @@ router.post('/batches', async (req, res, next) => {
   const errors = batchErrors(b);
   if (errors.length) return res.status(400).render('admin/batch-form', { title: 'Add batch', b, errors, action: '/admin/batches', isEdit: false, modes: MODES });
   try {
-    await db.query('INSERT INTO batches (name, level, age_group, days, timing, mode, seats_left, fee, is_active) VALUES (?,?,?,?,?,?,?,?,?)',
-      [b.name, b.level, b.age_group, b.days, b.timing, b.mode, b.seats_left, b.fee || null, b.is_active]);
+    await db.query('INSERT INTO batches (admin_id, name, level, age_group, days, timing, mode, seats_left, fee, is_active) VALUES (?,?,?,?,?,?,?,?,?,?)',
+      [req.admin.id, b.name, b.level, b.age_group, b.days, b.timing, b.mode, b.seats_left, b.fee || null, b.is_active]);
     req.session.flash = { type: 'success', text: 'Batch added.' };
     res.redirect('/admin/batches');
   } catch (err) { next(err); }
@@ -224,7 +269,7 @@ router.post('/batches', async (req, res, next) => {
 
 router.get('/batches/:id/edit', async (req, res, next) => {
   try {
-    const [rows] = await db.query('SELECT * FROM batches WHERE id = ?', [req.params.id]);
+    const [rows] = await db.query('SELECT * FROM batches WHERE id = ? AND admin_id = ?', [req.params.id, req.admin.id]);
     if (!rows.length) return res.redirect('/admin/batches');
     res.render('admin/batch-form', { title: 'Edit batch', b: { ...rows[0], fee: rows[0].fee || '' }, errors: [], action: `/admin/batches/${rows[0].id}`, isEdit: true, modes: MODES });
   } catch (err) { next(err); }
@@ -235,8 +280,8 @@ router.post('/batches/:id', async (req, res, next) => {
   const errors = batchErrors(b);
   if (errors.length) return res.status(400).render('admin/batch-form', { title: 'Edit batch', b, errors, action: `/admin/batches/${req.params.id}`, isEdit: true, modes: MODES });
   try {
-    await db.query('UPDATE batches SET name=?, level=?, age_group=?, days=?, timing=?, mode=?, seats_left=?, fee=?, is_active=? WHERE id=?',
-      [b.name, b.level, b.age_group, b.days, b.timing, b.mode, b.seats_left, b.fee || null, b.is_active, req.params.id]);
+    await db.query('UPDATE batches SET name=?, level=?, age_group=?, days=?, timing=?, mode=?, seats_left=?, fee=?, is_active=? WHERE id=? AND admin_id=?',
+      [b.name, b.level, b.age_group, b.days, b.timing, b.mode, b.seats_left, b.fee || null, b.is_active, req.params.id, req.admin.id]);
     req.session.flash = { type: 'success', text: 'Batch updated.' };
     res.redirect('/admin/batches');
   } catch (err) { next(err); }
@@ -244,19 +289,20 @@ router.post('/batches/:id', async (req, res, next) => {
 
 router.post('/batches/:id/delete', async (req, res, next) => {
   try {
-    await db.query('DELETE FROM batches WHERE id = ?', [req.params.id]);
+    await db.query('DELETE FROM batches WHERE id = ? AND admin_id = ?', [req.params.id, req.admin.id]);
     req.session.flash = { type: 'success', text: 'Batch deleted. Its students are now unassigned.' };
     res.redirect('/admin/batches');
   } catch (err) {
     if (err.code === 'ER_ROW_IS_REFERENCED_2') {
-      req.session.flash = { type: 'danger', text: 'This batch still has exams. Delete or move those exams first, or untick "Show on website" to hide the batch.' };
+      req.session.flash = { type: 'danger', text: 'This batch still has exams. Delete or move those exams first, or untick "Batch is active" to stop using it.' };
       return res.redirect('/admin/batches');
     }
     next(err);
   }
 });
 
-/* ---------- messages ---------- */
+/* ---------- messages (website enquiries: owner only) ---------- */
+router.use('/messages', requireOwner);
 router.get('/messages', async (req, res, next) => {
   try {
     const [messages] = await db.query('SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 300');
@@ -272,6 +318,8 @@ router.post('/messages/:id/delete', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+router.use('/teachers', requireOwner, require('./admin-teachers'));
 router.use(require('./admin-exams'));
+router.use(require('./admin-attendance'));
 
 module.exports = router;

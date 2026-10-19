@@ -26,15 +26,6 @@
               <label for="email" class="form-label">Email (optional)</label>
               <input type="email" class="form-control" id="email" name="email" value="<%= form.email %>">
             </div>
-            <div class="col-md-6">
-              <label for="batch_interest" class="form-label">Batch you are interested in</label>
-              <select class="form-select" id="batch_interest" name="batch_interest">
-                <option value="">Not sure yet</option>
-                <% batches.forEach(b => { %>
-                  <option value="<%= b.name %>" <%= form.batch_interest === b.name ? 'selected' : '' %>><%= b.name %></option>
-                <% }) %>
-              </select>
-            </div>
             <div class="col-12">
               <label for="message" class="form-label">Message</label>
               <textarea class="form-control" id="message" name="message" rows="5" required><%= form.message %></textarea>

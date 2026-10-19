@@ -1,0 +1,136 @@
+<%- include('partials/header') %>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h1 class="h3 mb-0">Attendance</h1>
+  <a class="btn btn-outline-primary" href="/admin/attendance/report?batch=<%= batchId || '' %>">Monthly report</a>
+</div>
+
+<% if (batches.length === 0) { %>
+  <div class="admin-card"><p class="mb-0 text-muted">Add a batch and students first.</p></div>
+<% } else { %>
+<div class="admin-card mb-4">
+  <form method="GET" action="/admin/attendance" class="row g-2 align-items-end mb-3">
+    <div class="col-md-5">
+      <label class="form-label" for="batch">Batch</label>
+      <select class="form-select" id="batch" name="batch" onchange="this.form.submit()">
+        <% batches.forEach(b => { %><option value="<%= b.id %>" <%= b.id === batchId ? 'selected' : '' %>><%= b.name %></option><% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label" for="date">Date</label>
+      <input class="form-control" type="date" id="date" name="date" value="<%= date %>" max="<%= today %>" onchange="this.form.submit()">
+    </div>
+    <div class="col-md-3"><button class="btn btn-primary w-100" type="submit">Show</button></div>
+  </form>
+
+  <h2 class="h5"><%= att.fmtDate(date) %><%= date === today ? ' (today)' : '' %></h2>
+
+  <% if (holiday) { %>
+    <div class="alert alert-warning d-flex justify-content-between align-items-center flex-wrap gap-2 mb-0">
+      <span><strong>Holiday for all students</strong><%= holiday.reason ? ' - ' + holiday.reason : '' %>. Attendance is not taken on holidays.</span>
+      <form method="POST" action="/admin/attendance/holiday/delete" class="m-0" onsubmit="return confirm('Remove this holiday?')">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="date" value="<%= date %>">
+        <input type="hidden" name="batch_id" value="<%= batchId %>">
+        <button class="btn btn-sm btn-outline-dark" type="submit">Remove holiday</button>
+        <% if (isOwner) { %><button class="btn btn-sm btn-outline-dark" type="submit" name="all" value="1">Remove for all teachers</button><% } %>
+      </form>
+    </div>
+  <% } else if (students.length === 0) { %>
+    <p class="text-muted mb-0">No active students in this batch.</p>
+  <% } else { %>
+    <form method="POST" action="/admin/attendance">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <input type="hidden" name="batch_id" value="<%= batchId %>">
+      <input type="hidden" name="date" value="<%= date %>">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <span class="text-muted small"><%= marked %> of <%= students.length %> marked</span>
+        <span>
+          <button type="button" class="btn btn-sm btn-outline-success" data-all="present">All present</button>
+          <button type="button" class="btn btn-sm btn-outline-danger" data-all="absent">All absent</button>
+        </span>
+      </div>
+      <div class="table-responsive">
+        <table class="table mb-3 table-stack">
+          <thead><tr><th>Student</th><th>Attendance</th></tr></thead>
+          <tbody>
+            <% students.forEach(s => { %>
+              <tr>
+                <td><%= s.name %></td>
+                <td class="text-nowrap">
+                  <div class="btn-group" role="group" aria-label="Attendance for <%= s.name %>">
+                    <input type="radio" class="btn-check" name="s_<%= s.id %>" id="p<%= s.id %>" value="present" <%= s.status === 'present' ? 'checked' : '' %>>
+                    <label class="btn btn-outline-success" for="p<%= s.id %>">Present</label>
+                    <input type="radio" class="btn-check" name="s_<%= s.id %>" id="a<%= s.id %>" value="absent" <%= s.status === 'absent' ? 'checked' : '' %>>
+                    <label class="btn btn-outline-danger" for="a<%= s.id %>">Absent</label>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-primary" type="submit">Save attendance</button>
+    </form>
+    <script>
+      document.querySelectorAll('[data-all]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('input[type=radio][value=' + btn.dataset.all + ']').forEach(function (r) { r.checked = true; });
+        });
+      });
+    </script>
+  <% } %>
+</div>
+
+<div class="admin-card">
+  <h2 class="h5">Holidays</h2>
+  <p class="text-muted small">A holiday applies to all of your students in every batch. It shows as a holiday on the student panel and is not counted as absent.</p>
+  <form method="POST" action="/admin/attendance/holiday" class="row g-2 align-items-end mb-3">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input type="hidden" name="batch_id" value="<%= batchId %>">
+    <div class="col-md-4">
+      <label class="form-label" for="hdate">Date</label>
+      <input class="form-control" type="date" id="hdate" name="date" value="<%= date %>" required>
+    </div>
+    <div class="col-md-5">
+      <label class="form-label" for="reason">Reason (optional)</label>
+      <input class="form-control" type="text" id="reason" name="reason" maxlength="150" placeholder="e.g. Diwali">
+    </div>
+    <div class="col-md-3"><button class="btn btn-warning w-100" type="submit">Mark holiday</button></div>
+    <% if (isOwner) { %>
+      <div class="col-12">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="hall" name="all" value="1">
+          <label class="form-check-label" for="hall">Apply to every teacher's students (whole institute closed)</label>
+        </div>
+      </div>
+    <% } %>
+  </form>
+  <% if (holidays.length === 0) { %>
+    <p class="text-muted mb-0">No upcoming holidays.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Date</th><th>Reason</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+          <% holidays.forEach(h => { %>
+            <tr>
+              <td><%= att.fmtDate(h.d) %></td>
+              <td><%= h.reason || '-' %></td>
+              <td class="text-end">
+                <form method="POST" action="/admin/attendance/holiday/delete" class="d-inline" onsubmit="return confirm('Remove this holiday?')">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <input type="hidden" name="date" value="<%= h.d %>">
+                  <input type="hidden" name="batch_id" value="<%= batchId %>">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Remove</button>
+                  <% if (isOwner) { %><button class="btn btn-sm btn-outline-danger" type="submit" name="all" value="1">Remove for all</button><% } %>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+<% } %>
+<%- include('partials/footer') %>

@@ -24,6 +24,7 @@ app.locals.site = {
 };
 
 app.locals.fmt = require('./lib/format');
+app.locals.att = require('./lib/attendance');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));

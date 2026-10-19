@@ -1,0 +1,101 @@
+<%- include('partials/header') %>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-0"><%= t.name || t.username %><% if (t.role === 'owner') { %> <span class="badge text-bg-primary fs-6">Owner</span><% } %></h1>
+    <div class="text-muted"><code><%= t.username %></code> &middot; <%= t.is_active ? 'Active' : 'Disabled' %> &middot; Joined <%= fmt.dateTime(t.created_at) %></div>
+  </div>
+  <div>
+    <a class="btn btn-outline-primary" href="/admin/teachers/<%= t.id %>/edit">Edit</a>
+    <a class="btn btn-outline-secondary" href="/admin/teachers">All teachers</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg"><div class="admin-card"><div class="stat"><%= summary.batches %></div><div class="text-muted">Batches</div></div></div>
+  <div class="col-6 col-lg"><div class="admin-card"><div class="stat"><%= summary.students %></div><div class="text-muted">Students</div></div></div>
+  <div class="col-6 col-lg"><div class="admin-card"><div class="stat"><%= summary.examsConducted %></div><div class="text-muted">Exams conducted</div></div></div>
+  <div class="col-6 col-lg"><div class="admin-card"><div class="stat"><%= summary.examsCreated %></div><div class="text-muted">Exams created</div></div></div>
+  <div class="col-12 col-lg"><div class="admin-card"><div class="stat"><%= summary.attendance === null ? '-' : summary.attendance + '%' %></div><div class="text-muted">Overall attendance</div></div></div>
+</div>
+
+<div class="admin-card mb-4">
+  <h2 class="h5">Batches</h2>
+  <% if (batches.length === 0) { %><p class="text-muted mb-0">No batches yet.</p><% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Batch</th><th>Level</th><th>Days</th><th>Timing</th><th>Students</th><th>Status</th></tr></thead>
+        <tbody>
+          <% batches.forEach(b => { %>
+            <tr><td><%= b.name %></td><td><%= b.level %></td><td><%= b.days %></td><td><%= b.timing %></td><td><%= b.student_count %></td>
+              <td><span class="badge text-bg-<%= b.is_active ? 'success' : 'secondary' %>"><%= b.is_active ? 'Active' : 'Inactive' %></span></td></tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<div class="admin-card mb-4">
+  <h2 class="h5">Students</h2>
+  <% if (students.length === 0) { %><p class="text-muted mb-0">No students yet.</p><% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Name</th><th>Batch</th><th>Present</th><th>Absent</th><th>Attendance</th><th>Status</th><th class="text-end">Calendar</th></tr></thead>
+        <tbody>
+          <% students.forEach(s => { %>
+            <tr>
+              <td><%= s.name %></td>
+              <td><%= s.batch_name || '-' %></td>
+              <td><%= s.present %></td>
+              <td><%= s.absent %></td>
+              <td><% if (s.percent === null) { %>-<% } else { %><span class="badge text-bg-<%= s.percent >= 75 ? 'success' : (s.percent >= 50 ? 'warning' : 'danger') %>"><%= s.percent %>%</span><% } %></td>
+              <td><span class="badge text-bg-<%= s.is_active ? 'success' : 'secondary' %>"><%= s.is_active ? 'Active' : 'Disabled' %></span></td>
+              <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/admin/attendance/student/<%= s.id %>">Open</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<div class="admin-card mb-4">
+  <h2 class="h5">Exams</h2>
+  <% if (exams.length === 0) { %><p class="text-muted mb-0">No exams yet.</p><% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Exam</th><th>Batch</th><th>Questions</th><th>Taken by</th><th>Completed</th><th>Average</th><th>Status</th></tr></thead>
+        <tbody>
+          <% exams.forEach(e => { %>
+            <tr>
+              <td><%= e.title %><div class="text-muted small"><%= fmt.dateTime(e.created_at) %></div></td>
+              <td><%= e.batch_name %></td>
+              <td><%= e.question_count %></td>
+              <td><%= e.attempts %></td>
+              <td><%= e.submitted %></td>
+              <td><%= e.avg_pct === null ? '-' : e.avg_pct + '%' %></td>
+              <td><span class="badge text-bg-<%= e.is_published ? 'success' : 'secondary' %>"><%= e.is_published ? 'Published' : 'Draft' %></span></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<div class="admin-card">
+  <h2 class="h5">Attendance - last 30 days</h2>
+  <% if (days.length === 0) { %><p class="text-muted mb-0">No attendance marked in the last 30 days.</p><% } else { %>
+    <div class="table-responsive">
+      <table class="table mb-0 table-stack">
+        <thead><tr><th>Date</th><th>Present</th><th>Absent</th><th>Attendance</th></tr></thead>
+        <tbody>
+          <% days.forEach(d => { const pc = att.percent(d.present, d.absent); %>
+            <tr><td><%= att.fmtDate(d.d) %></td><td><%= d.present %></td><td><%= d.absent %></td><td><%= pc === null ? '-' : pc + '%' %></td></tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

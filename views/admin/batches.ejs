@@ -19,7 +19,7 @@
               <td><%= b.days %><br><small class="text-muted"><%= b.timing %></small></td>
               <td><%= b.mode %></td>
               <td><%= b.seats_left %></td>
-              <td><span class="badge text-bg-<%= b.is_active ? 'success' : 'secondary' %>"><%= b.is_active ? 'Shown' : 'Hidden' %></span></td>
+              <td><span class="badge text-bg-<%= b.is_active ? 'success' : 'secondary' %>"><%= b.is_active ? 'Active' : 'Inactive' %></span></td>
               <td class="text-end text-nowrap">
                 <a class="btn btn-sm btn-outline-primary" href="/admin/batches/<%= b.id %>/edit">Edit</a>
                 <form method="POST" action="/admin/batches/<%= b.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this batch?')">

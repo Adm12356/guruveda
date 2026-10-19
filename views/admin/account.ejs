@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-3">My account</h1>
+<div class="admin-card" style="max-width: 520px;">
+  <p class="mb-3"><strong><%= admin.name || admin.username %></strong><br><span class="text-muted">Username: <code><%= admin.username %></code> &middot; <%= isOwner ? 'Owner' : 'Teacher' %></span></p>
+  <h2 class="h5">Change password</h2>
+  <% if (errors.length) { %>
+    <div class="alert alert-danger" role="alert"><ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+  <form method="POST" action="/admin/account" autocomplete="off">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="mb-3"><label class="form-label" for="current">Current password</label><input class="form-control" type="password" id="current" name="current" autocomplete="current-password" required></div>
+    <div class="mb-3"><label class="form-label" for="password">New password (8+ characters)</label><input class="form-control" type="password" id="password" name="password" autocomplete="new-password" minlength="8" required></div>
+    <div class="mb-3"><label class="form-label" for="confirm">Repeat new password</label><input class="form-control" type="password" id="confirm" name="confirm" autocomplete="new-password" minlength="8" required></div>
+    <button class="btn btn-primary" type="submit">Change password</button>
+  </form>
+</div>
+<%- include('partials/footer') %>
