@@ -319,6 +319,7 @@ router.post('/messages/:id/delete', async (req, res, next) => {
 });
 
 router.use('/teachers', requireOwner, require('./admin-teachers'));
+router.use('/branches', requireOwner, require('./admin-branches'));
 router.use(require('./admin-exams'));
 router.use(require('./admin-attendance'));
 

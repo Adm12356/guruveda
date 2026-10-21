@@ -19,7 +19,7 @@
     <div class="collapse navbar-collapse" id="adminMenu">
       <ul class="navbar-nav me-auto">
         <% const links = isOwner
-             ? [['/admin', 'Dashboard'], ['/admin/teachers', 'Teachers'], ['/admin/events', 'Events'], ['/admin/batches', 'Batches'], ['/admin/students', 'Students'], ['/admin/attendance', 'Attendance'], ['/admin/exams', 'Exams'], ['/admin/messages', 'Messages']]
+             ? [['/admin', 'Dashboard'], ['/admin/teachers', 'Teachers'], ['/admin/events', 'Events'], ['/admin/branches', 'Locations'], ['/admin/batches', 'Batches'], ['/admin/students', 'Students'], ['/admin/attendance', 'Attendance'], ['/admin/exams', 'Exams'], ['/admin/messages', 'Messages']]
              : [['/admin', 'Dashboard'], ['/admin/batches', 'Batches'], ['/admin/students', 'Students'], ['/admin/attendance', 'Attendance'], ['/admin/exams', 'Exams']];
            links.forEach(l => { %>
           <li class="nav-item"><a class="nav-link <%= (l[0] === '/admin' ? currentPath === '/admin' || currentPath === '/admin/' : currentPath.startsWith(l[0])) ? 'active' : '' %>" href="<%= l[0] %>"><%= l[1] %></a></li>

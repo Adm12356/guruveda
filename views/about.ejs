@@ -78,4 +78,41 @@
   </div>
 </section>
 
+
+<!-- Our branches -->
+
+
+
+<!-- Our branches (edited by the owner in Admin > Locations) -->
+<% if (mainBranches.length || franchises.length) { %>
+<section class="section section-tint">
+  <div class="container">
+    <h2 class="section-title" style="text-align: center;">Our Branches</h2>
+    <div class="branches-panel">
+      <% if (mainBranches.length) { %>
+        <h3 class="branches-heading"><span aria-hidden="true">🏢</span> Main Branches</h3>
+        <div class="row g-3 mb-4">
+          <% mainBranches.forEach(function (b) { %>
+            <div class="col-md-6">
+              <div class="branch-main">
+                <h4 class="branch-name"><span aria-hidden="true">📍</span> <%= b.name %></h4>
+                <% if (b.note) { %><p class="branch-note"><%= b.note %></p><% } %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+      <% if (franchises.length) { %>
+        <h3 class="branches-heading"><span aria-hidden="true">🌍</span> Franchises</h3>
+        <div class="row g-3">
+          <% franchises.forEach(function (f) { %>
+            <div class="col-6 col-lg-4"><div class="branch-franchise"><%= f.name %></div></div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+<% } %>
+
 <%- include('partials/footer') %>

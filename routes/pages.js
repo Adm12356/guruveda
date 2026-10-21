@@ -17,8 +17,14 @@ router.get('/', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-router.get('/about', (req, res) => {
-  res.render('about', { title: 'About us' });
+router.get('/about', async (req, res) => {
+  let mainBranches = [], franchises = [];
+  try {
+    const [rows] = await db.query('SELECT type, name, note FROM branches ORDER BY sort_order, id');
+    mainBranches = rows.filter(r => r.type === 'main');
+    franchises = rows.filter(r => r.type === 'franchise');
+  } catch (err) { console.error('Could not load branches (run branches.sql):', err.message); }
+  res.render('about', { title: 'About us', mainBranches, franchises });
 });
 
 router.get('/events', async (req, res, next) => {

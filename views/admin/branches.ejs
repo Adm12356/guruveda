@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+<h1 class="h3 mb-1">Branches &amp; franchises</h1>
+<p class="text-muted mb-4">These appear in the "Our Branches" section of the About page. Changes show on the website immediately.</p>
+
+<% [
+  { type: 'main', title: 'Main branches', rows: mainBranches, withNote: true, addLabel: 'Add main branch' },
+  { type: 'franchise', title: 'Franchises', rows: franchises, withNote: false, addLabel: 'Add franchise' }
+].forEach(function (g) { %>
+<div class="admin-card mb-4">
+  <h2 class="h5"><%= g.title %></h2>
+  <% if (g.rows.length === 0) { %><p class="text-muted">Nothing added yet.</p><% } %>
+  <% g.rows.forEach(function (r) { %>
+    <div class="row g-2 align-items-center mb-2">
+      <form method="POST" action="/admin/branches/<%= r.id %>" class="col-12 col-lg d-flex flex-wrap gap-2 m-0">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input class="form-control" style="flex: 1 1 14rem;" type="text" name="name" value="<%= r.name %>" maxlength="80" required aria-label="Name">
+        <% if (g.withNote) { %><input class="form-control" style="flex: 1 1 14rem;" type="text" name="note" value="<%= r.note || '' %>" maxlength="100" placeholder="Note, e.g. Head Office – Pune Region" aria-label="Note"><% } %>
+        <button class="btn btn-primary" type="submit">Save</button>
+      </form>
+      <form method="POST" action="/admin/branches/<%= r.id %>/delete" class="col-auto m-0" onsubmit="return confirm('Remove this entry from the website?')">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <button class="btn btn-outline-danger" type="submit">Delete</button>
+      </form>
+    </div>
+  <% }) %>
+
+  <hr>
+  <form method="POST" action="/admin/branches" class="d-flex flex-wrap gap-2 m-0">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input type="hidden" name="type" value="<%= g.type %>">
+    <input class="form-control" style="flex: 1 1 14rem;" type="text" name="name" maxlength="80" placeholder="<%= g.type === 'main' ? 'Branch name' : 'Franchise name, e.g. Nashik' %>" required aria-label="New name">
+    <% if (g.withNote) { %><input class="form-control" style="flex: 1 1 14rem;" type="text" name="note" maxlength="100" placeholder="Note (optional)" aria-label="New note"><% } %>
+    <button class="btn btn-warning" type="submit"><%= g.addLabel %></button>
+  </form>
+</div>
+<% }) %>
+<%- include('partials/footer') %>
