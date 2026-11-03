@@ -73,12 +73,8 @@ app.use((err, req, res, next) => {
 
 // Production port and host binding (0.0.0.0 is mandatory for Render and container environments)
 const PORT = process.env.PORT || 3000;
-<<<<<<< Updated upstream
-app.listen(process.env.PORT || 3000, () => { console.log('Running on port ' + process.env.PORT); }); 
-=======
 const HOST = '0.0.0.0';
 
 app.listen(PORT, HOST, () => {
   console.log(`[Guruveda] Production server running on http://${HOST}:${PORT}`);
 });
->>>>>>> Stashed changes
