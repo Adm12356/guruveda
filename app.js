@@ -10,8 +10,16 @@ const student = require('./routes/student');
 
 const app = express();
 
+// Required for hosting behind reverse proxies (Render, Railway, Fly, Nginx, Cloudflare)
+app.set('trust proxy', 1);
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Instant healthcheck endpoint for Render / Cloud port scanners (never fails or queries DB)
+app.get(['/healthz', '/health'], (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: Math.floor(process.uptime()), timestamp: Date.now() });
+});
 
 // Edit these once - they appear in the header, footer and contact page.
 app.locals.site = {
@@ -29,15 +37,20 @@ app.locals.att = require('./lib/attendance');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(fileUpload({ limits: { fileSize: 5 * 1024 * 1024 }, abortOnLimit: true })); // ready for a future admin panel
+app.use(fileUpload({ limits: { fileSize: 5 * 1024 * 1024 }, abortOnLimit: true }));
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-only-secret',
+  secret: process.env.SESSION_SECRET || 'guruveda-production-secret-session-key',
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, maxAge: 1000 * 60 * 60 * 2 }
+  cookie: {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 2,
+    sameSite: 'lax'
+  }
 }));
 
-// One-time flash message (used after the contact form)
+// One-time flash message (used after forms)
 app.use((req, res, next) => {
   res.locals.flash = req.session.flash || null;
   delete req.session.flash;
@@ -54,9 +67,18 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error('[Error Handler]', err);
   res.status(500).render('error', { title: 'Something went wrong', heading: 'Something went wrong', message: 'Please try again in a moment.' });
 });
 
+// Production port and host binding (0.0.0.0 is mandatory for Render and container environments)
 const PORT = process.env.PORT || 3000;
+<<<<<<< Updated upstream
 app.listen(process.env.PORT || 3000, () => { console.log('Running on port ' + process.env.PORT); }); 
+=======
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log(`[Guruveda] Production server running on http://${HOST}:${PORT}`);
+});
+>>>>>>> Stashed changes

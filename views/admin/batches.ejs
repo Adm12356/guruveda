@@ -1,30 +1,74 @@
 <%- include('partials/header') %>
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-  <h1 class="h3 mb-0">Batches</h1>
-  <a class="btn btn-primary" href="/admin/batches/new">Add batch</a>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1 fw-bold text-dark"><i class="bi bi-collection-fill text-primary me-2"></i>Batches & Schedule</h1>
+    <p class="text-muted small mb-0">Configure class timings, levels, age groups, mode (Online/Offline), and capacity.</p>
+  </div>
+  <a class="btn btn-primary rounded-pill px-4 shadow-sm" href="/admin/batches/new">
+    <i class="bi bi-plus-circle-fill me-1"></i>Add Batch
+  </a>
 </div>
-<div class="admin-card">
+
+<div class="admin-card shadow-sm">
   <% if (batches.length === 0) { %>
-    <p class="text-muted mb-0">No batches yet. Add your first one.</p>
+    <div class="p-5 text-center">
+      <i class="bi bi-collection display-4 text-muted mb-3 d-block"></i>
+      <h3 class="h5">No batches configured</h3>
+      <p class="text-muted mb-3">Create your first class batch to start assigning students and tests.</p>
+      <a class="btn btn-primary rounded-pill px-4" href="/admin/batches/new">Add First Batch</a>
+    </div>
   <% } else { %>
     <div class="table-responsive">
-      <table class="table mb-0 table-stack">
-        <thead><tr><th>Name</th><th>Level</th><th>Age</th><th>Days and time</th><th>Mode</th><th>Seats</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+      <table class="table align-middle table-hover mb-0 table-stack">
+        <thead class="table-light">
+          <tr>
+            <th>Batch Name</th>
+            <th>Level & Age</th>
+            <th>Days & Timing</th>
+            <th>Mode</th>
+            <th>Seats Available</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
         <tbody>
           <% batches.forEach(b => { %>
             <tr>
-              <td><%= b.name %></td>
-              <td><%= b.level %></td>
-              <td><%= b.age_group %></td>
-              <td><%= b.days %><br><small class="text-muted"><%= b.timing %></small></td>
-              <td><%= b.mode %></td>
-              <td><%= b.seats_left %></td>
-              <td><span class="badge text-bg-<%= b.is_active ? 'success' : 'secondary' %>"><%= b.is_active ? 'Active' : 'Inactive' %></span></td>
+              <td>
+                <strong class="text-dark d-block"><%= b.name %></strong>
+                <% if (b.fee) { %><small class="text-muted"><i class="bi bi-tag me-1"></i>Fee: <%= b.fee %></small><% } %>
+              </td>
+              <td>
+                <div><span class="badge text-bg-light border text-dark fw-semibold"><%= b.level %></span></div>
+                <small class="text-muted"><%= b.age_group %></small>
+              </td>
+              <td>
+                <div class="small fw-semibold text-dark"><%= b.days %></div>
+                <small class="text-muted"><i class="bi bi-clock me-1"></i><%= b.timing %></small>
+              </td>
+              <td>
+                <span class="badge rounded-pill <%= b.mode === 'Online' ? 'text-bg-info bg-opacity-25 text-dark' : (b.mode === 'Hybrid' ? 'text-bg-warning bg-opacity-25 text-dark' : 'text-bg-light border text-dark') %>">
+                  <i class="bi <%= b.mode === 'Online' ? 'bi-laptop' : (b.mode === 'Hybrid' ? 'bi-shuffle' : 'bi-building') %> me-1"></i><%= b.mode %>
+                </span>
+              </td>
+              <td>
+                <span class="fw-bold <%= b.seats_left <= 2 ? 'text-danger' : 'text-success' %>"><%= b.seats_left %> seats</span>
+              </td>
+              <td>
+                <span class="badge rounded-pill <%= b.is_active ? 'text-bg-success' : 'text-bg-secondary' %> px-3 py-1">
+                  <%= b.is_active ? 'Active' : 'Archived' %>
+                </span>
+              </td>
               <td class="text-end text-nowrap">
-                <a class="btn btn-sm btn-outline-primary" href="/admin/batches/<%= b.id %>/edit">Edit</a>
-                <form method="POST" action="/admin/batches/<%= b.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this batch?')">
+                <a class="btn btn-sm btn-outline-primary rounded-pill px-3 me-1" href="/admin/batches/<%= b.id %>/edit">
+                  <i class="bi bi-pencil me-1"></i>Edit
+                </a>
+                <form method="POST" action="/admin/batches/<%= b.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this batch? Students will become unassigned.')">
                   <input type="hidden" name="_csrf" value="<%= csrf %>">
-                  <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                  <button class="btn btn-sm btn-outline-danger rounded-pill px-3" type="submit">
+                    <i class="bi bi-trash me-1"></i>Delete
+                  </button>
                 </form>
               </td>
             </tr>
@@ -34,4 +78,5 @@
     </div>
   <% } %>
 </div>
+
 <%- include('partials/footer') %>

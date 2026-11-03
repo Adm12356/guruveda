@@ -1,27 +1,76 @@
 <%- include('partials/header') %>
-<h1 class="h3 mb-3">Exams</h1>
-<div class="admin-card">
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1 fw-bold text-dark"><i class="bi bi-pencil-square text-primary me-2"></i>My Batch Exams</h1>
+    <p class="text-muted small mb-0">Assessments published by your teacher for your batch.</p>
+  </div>
+</div>
+
+<div class="admin-card shadow-sm">
   <% if (exams.length === 0) { %>
-    <p class="text-muted mb-0">There are no exams for your batch right now. Check back later.</p>
+    <div class="p-5 text-center text-muted">
+      <i class="bi bi-journal-check display-4 d-block mb-3 text-muted"></i>
+      <h3 class="h5">No exams currently scheduled for your batch</h3>
+      <p class="mb-0">When your teacher publishes a level assessment or speed drill, it will appear here.</p>
+    </div>
   <% } else { %>
     <div class="table-responsive">
-      <table class="table mb-0 table-stack">
-        <thead><tr><th>Exam</th><th>Questions</th><th>Time allowed</th><th>Status</th><th class="text-end"></th></tr></thead>
+      <table class="table align-middle table-hover mb-0 table-stack">
+        <thead class="table-light">
+          <tr>
+            <th>Exam Title</th>
+            <th>Questions & Marks</th>
+            <th>Time Allowed</th>
+            <th>Status</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
         <tbody>
           <% exams.forEach(e => { const finished = e.attempt_status === 'submitted' || e.attempt_status === 'auto_submitted'; %>
             <tr>
-              <td><strong><%= e.title %></strong></td>
-              <td><%= e.question_count %> <small class="text-muted">(<%= e.total_marks %> marks)</small></td>
-              <td><%= e.duration_minutes %> min</td>
               <td>
-                <% if (finished) { %><span class="badge text-bg-success">Completed: <%= e.score %> / <%= e.got_total %></span>
-                <% } else if (e.attempt_status === 'in_progress') { %><span class="badge text-bg-warning">In progress</span>
-                <% } else { %><span class="badge text-bg-secondary">Not taken</span><% } %>
+                <strong class="d-block text-dark"><%= e.title %></strong>
+                <% if (e.description) { %><small class="text-muted text-truncate-2 d-inline-block" style="max-width: 280px;"><%= e.description %></small><% } %>
+              </td>
+              <td>
+                <span class="fw-semibold"><%= e.question_count %> questions</span>
+                <small class="text-muted d-block">(<%= e.total_marks %> total marks)</small>
+              </td>
+              <td>
+                <span class="badge text-bg-light border text-dark">
+                  <i class="bi bi-stopwatch me-1 text-primary"></i><%= e.duration_minutes %> min
+                </span>
+              </td>
+              <td>
+                <% if (finished) { %>
+                  <span class="badge rounded-pill text-bg-success px-3 py-1">
+                    <i class="bi bi-check-circle-fill me-1"></i>Score: <%= e.score %> / <%= e.got_total %>
+                  </span>
+                <% } else if (e.attempt_status === 'in_progress') { %>
+                  <span class="badge rounded-pill text-bg-warning px-3 py-1 text-dark">
+                    <i class="bi bi-hourglass-split me-1"></i>In Progress
+                  </span>
+                <% } else { %>
+                  <span class="badge rounded-pill text-bg-light border text-muted px-3 py-1">
+                    <i class="bi bi-circle me-1"></i>Not Taken Yet
+                  </span>
+                <% } %>
               </td>
               <td class="text-end">
-                <% if (finished) { %><a class="btn btn-sm btn-outline-primary" href="/student/results/<%= e.id %>">View result</a>
-                <% } else if (e.attempt_status === 'in_progress') { %><a class="btn btn-sm btn-warning" href="/student/exams/<%= e.id %>/take">Resume</a>
-                <% } else { %><a class="btn btn-sm btn-primary" href="/student/exams/<%= e.id %>">Open</a><% } %>
+                <% if (finished) { %>
+                  <a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="/student/results/<%= e.id %>">
+                    <i class="bi bi-eye me-1"></i>View Result
+                  </a>
+                <% } else if (e.attempt_status === 'in_progress') { %>
+                  <a class="btn btn-sm btn-warning rounded-pill px-3 text-dark fw-bold" href="/student/exams/<%= e.id %>/take">
+                    <i class="bi bi-play-circle-fill me-1"></i>Resume Exam
+                  </a>
+                <% } else { %>
+                  <a class="btn btn-sm btn-primary rounded-pill px-4 fw-semibold" href="/student/exams/<%= e.id %>">
+                    <i class="bi bi-arrow-right-circle me-1"></i>Start Exam
+                  </a>
+                <% } %>
               </td>
             </tr>
           <% }) %>
@@ -30,4 +79,5 @@
     </div>
   <% } %>
 </div>
+
 <%- include('partials/footer') %>

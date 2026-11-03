@@ -3,40 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1b2a5b">
+  <meta name="theme-color" content="#0d152e">
   <meta name="robots" content="noindex, nofollow">
-  <title><%= title %> | Admin</title>
+  <title><%= title %> | Admin Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="/css/admin.css" rel="stylesheet">
 </head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark admin-nav">
-  <div class="container">
-    <a class="navbar-brand" href="/admin">Admin</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminMenu" aria-controls="adminMenu" aria-expanded="false" aria-label="Toggle navigation">
+<body class="admin-body">
+<nav class="navbar navbar-expand-xl navbar-dark admin-nav sticky-top">
+  <div class="container-fluid px-lg-4">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/admin">
+      <span class="admin-brand-icon">🧮</span>
+      <span class="admin-brand-title">Guruveda <span class="admin-badge-role <%= isOwner ? 'badge-owner' : 'badge-teacher' %>"><%= isOwner ? 'Owner' : 'Teacher' %></span></span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#adminMenu" aria-controls="adminMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="adminMenu">
-      <ul class="navbar-nav me-auto">
-        <% const links = isOwner
-             ? [['/admin', 'Dashboard'], ['/admin/teachers', 'Teachers'], ['/admin/events', 'Events'], ['/admin/branches', 'Locations'], ['/admin/batches', 'Batches'], ['/admin/students', 'Students'], ['/admin/attendance', 'Attendance'], ['/admin/exams', 'Exams'], ['/admin/messages', 'Messages']]
-             : [['/admin', 'Dashboard'], ['/admin/batches', 'Batches'], ['/admin/students', 'Students'], ['/admin/attendance', 'Attendance'], ['/admin/exams', 'Exams']];
-           links.forEach(l => { %>
-          <li class="nav-item"><a class="nav-link <%= (l[0] === '/admin' ? currentPath === '/admin' || currentPath === '/admin/' : currentPath.startsWith(l[0])) ? 'active' : '' %>" href="<%= l[0] %>"><%= l[1] %></a></li>
+      <ul class="navbar-nav me-auto mb-2 mb-xl-0 gap-1 pt-2 pt-xl-0">
+        <% 
+          const ownerLinks = [
+            ['/admin', 'Dashboard', 'bi-speedometer2'],
+            ['/admin/teachers', 'Teachers', 'bi-person-badge-fill'],
+            ['/admin/batches', 'Batches', 'bi-collection-fill'],
+            ['/admin/students', 'Students', 'bi-people-fill'],
+            ['/admin/attendance', 'Attendance', 'bi-calendar-check-fill'],
+            ['/admin/exams', 'Exams', 'bi-journal-check'],
+            ['/admin/events', 'Events', 'bi-calendar-event-fill'],
+            ['/admin/branches', 'Locations', 'bi-geo-alt-fill'],
+            ['/admin/messages', 'Messages', 'bi-envelope-fill']
+          ];
+          const teacherLinks = [
+            ['/admin', 'Dashboard', 'bi-speedometer2'],
+            ['/admin/batches', 'Batches', 'bi-collection-fill'],
+            ['/admin/students', 'Students', 'bi-people-fill'],
+            ['/admin/attendance', 'Attendance', 'bi-calendar-check-fill'],
+            ['/admin/exams', 'Exams', 'bi-journal-check']
+          ];
+          const navLinks = isOwner ? ownerLinks : teacherLinks;
+          navLinks.forEach(l => { 
+            const isActive = (l[0] === '/admin' ? (currentPath === '/admin' || currentPath === '/admin/') : currentPath.startsWith(l[0]));
+        %>
+          <li class="nav-item">
+            <a class="nav-link admin-nav-link <%= isActive ? 'active' : '' %>" href="<%= l[0] %>">
+              <i class="bi <%= l[2] %> me-1"></i><%= l[1] %>
+            </a>
+          </li>
         <% }) %>
       </ul>
-      <div class="d-flex align-items-center gap-3">
-        <a class="nav-link text-white-50 p-0" href="/admin/account"><%= admin.name || admin.username %><%= isOwner ? ' (Owner)' : '' %></a>
-        <a class="nav-link text-white-50 p-0" href="/" target="_blank" rel="noopener">View site</a>
+      <div class="d-flex align-items-center gap-2 pt-2 pt-xl-0 border-top border-xl-0 border-secondary border-opacity-25">
+        <a class="admin-user-pill" href="/admin/account" title="Account settings">
+          <i class="bi bi-person-circle"></i>
+          <span><%= admin.name || admin.username %></span>
+        </a>
+        <a class="btn btn-sm btn-outline-light rounded-pill px-3" href="/" target="_blank" rel="noopener" title="Open public site in new tab">
+          <i class="bi bi-globe me-1"></i>Site
+        </a>
         <form method="POST" action="/admin/logout" class="m-0">
           <input type="hidden" name="_csrf" value="<%= csrf %>">
-          <button class="btn btn-sm btn-outline-light" type="submit">Log out</button>
+          <button class="btn btn-sm btn-danger rounded-pill px-3" type="submit" title="Sign out">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+          </button>
         </form>
       </div>
     </div>
   </div>
 </nav>
-<main class="container py-4">
+
+<main class="container-fluid px-lg-4 py-4">
 <% if (flash) { %>
-  <div class="alert alert-<%= flash.type %>" role="status"><%= flash.text %></div>
+  <div class="alert alert-<%= flash.type %> alert-dismissible fade show modern-admin-alert mb-4 shadow-sm" role="status">
+    <i class="bi <%= flash.type === 'success' ? 'bi-check-circle-fill' : (flash.type === 'danger' ? 'bi-exclamation-octagon-fill' : 'bi-info-circle-fill') %> me-2"></i>
+    <%= flash.text %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
 <% } %>

@@ -1,35 +1,71 @@
 <%- include('partials/header') %>
-<form id="examForm" method="POST" action="/student/exams/<%= exam.id %>/submit"
-      data-remaining="<%= remaining %>" data-save-url="/student/exams/<%= exam.id %>/save-answer" data-csrf="<%= csrf %>">
-  <input type="hidden" name="_csrf" value="<%= csrf %>">
-  <input type="hidden" name="auto" value="0">
 
-  <div id="timerBar" class="timer-bar">
-    <div>
-      <strong><%= exam.title %></strong><br>
-      <small id="answeredCount"></small>
+<div class="exam-container max-w-800 mx-auto">
+  <form id="examForm" method="POST" action="/student/exams/<%= exam.id %>/submit"
+        data-remaining="<%= remaining %>" data-save-url="/student/exams/<%= exam.id %>/save-answer" data-csrf="<%= csrf %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input type="hidden" name="auto" value="0">
+
+    <!-- Sticky Exam HUD -->
+    <div id="timerBar" class="exam-hud-bar shadow-sm">
+      <div class="hud-left">
+        <span class="badge text-bg-primary rounded-pill mb-1">
+          <i class="bi bi-file-earmark-text me-1"></i>Exam in Progress
+        </span>
+        <h2 class="h5 mb-0 fw-bold hud-title"><%= exam.title %></h2>
+        <div class="small text-muted" id="answeredCount">Answered 0 of <%= questions.length %></div>
+      </div>
+      <div class="hud-right">
+        <div class="timer-label"><i class="bi bi-stopwatch me-1"></i>Time Remaining</div>
+        <div id="timer" class="timer-value" role="timer" aria-live="off">--:--</div>
+      </div>
     </div>
-    <div class="text-end">
-      <div class="timer-label">Time left</div>
-      <div id="timer" class="timer-value" role="timer" aria-live="off">--:--</div>
+
+    <div id="timeUp" class="alert alert-danger d-none shadow-sm rounded-4 mt-3" role="alert">
+      <i class="bi bi-alarm-fill me-2 fs-5"></i>Time is up! Your answers are being submitted automatically...
     </div>
-  </div>
 
-  <div id="timeUp" class="alert alert-warning d-none" role="alert">Time is up. Submitting your answers...</div>
-
-  <% questions.forEach((q, i) => { %>
-    <fieldset class="admin-card q-block mb-3">
-      <legend class="h6 float-none"><span class="text-muted">Q<%= i + 1 %>.</span> <%= q.question_text %> <small class="text-muted">(<%= q.marks %> mark<%= q.marks === 1 ? '' : 's' %>)</small></legend>
-      <% ['A', 'B', 'C', 'D'].forEach(o => { %>
-        <div class="form-check py-1">
-          <input class="form-check-input" type="radio" name="q_<%= q.id %>" id="q<%= q.id %><%= o %>" value="<%= o %>" data-qid="<%= q.id %>" <%= answers[q.id] === o ? 'checked' : '' %>>
-          <label class="form-check-label" for="q<%= q.id %><%= o %>"><%= q['option_' + o.toLowerCase()] %></label>
-        </div>
+    <!-- Questions List -->
+    <div class="questions-stack mt-4">
+      <% questions.forEach((q, i) => { %>
+        <fieldset class="admin-card q-block mb-4 shadow-sm" id="question_<%= q.id %>">
+          <legend class="h6 float-none border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
+            <span>
+              <span class="badge bg-primary text-white rounded-circle me-2 q-number"><%= i + 1 %></span>
+              <span class="fw-bold"><%= q.question_text %></span>
+            </span>
+            <span class="badge text-bg-light border text-muted">
+              <%= q.marks %> mark<%= q.marks === 1 ? '' : 's' %>
+            </span>
+          </legend>
+          
+          <div class="options-grid">
+            <% ['A', 'B', 'C', 'D'].forEach(o => { %>
+              <div class="form-check q-option-card">
+                <input class="form-check-input" type="radio" name="q_<%= q.id %>" id="q<%= q.id %><%= o %>" value="<%= o %>" data-qid="<%= q.id %>" <%= answers[q.id] === o ? 'checked' : '' %>>
+                <label class="form-check-label w-100" for="q<%= q.id %><%= o %>">
+                  <span class="option-badge"><%= o %></span>
+                  <span class="option-text"><%= q['option_' + o.toLowerCase()] %></span>
+                </label>
+              </div>
+            <% }) %>
+          </div>
+        </fieldset>
       <% }) %>
-    </fieldset>
-  <% }) %>
+    </div>
 
-  <button type="submit" class="btn btn-primary btn-lg mb-4">Submit exam</button>
-</form>
+    <!-- Submit Exam Bar -->
+    <div class="submit-tray p-4 bg-white rounded-4 shadow-sm border border-light-subtle d-flex justify-content-between align-items-center flex-wrap gap-3 mb-5">
+      <div>
+        <h3 class="h6 mb-1 fw-bold">Ready to finish?</h3>
+        <p class="small text-muted mb-0">Answers are autosaved. You can review any question before submitting.</p>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">
+        <i class="bi bi-check2-circle me-2"></i>Submit Exam
+      </button>
+    </div>
+  </form>
+</div>
+
 <script src="/js/exam-timer.js"></script>
 <%- include('partials/footer') %>

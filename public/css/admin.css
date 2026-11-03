@@ -1,112 +1,576 @@
-body { background: #f4f6fb; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.admin-nav { background: #1b2a5b; }
-.admin-nav .navbar-brand { font-weight: 700; }
-.admin-nav .nav-link { color: #d7defa; }
-.admin-nav .nav-link:hover, .admin-nav .nav-link.active { color: #fff; }
-.admin-nav .nav-link.active { box-shadow: inset 0 -3px 0 #f5b82e; }
-.admin-card { background: #fff; border: 1px solid #d9dfee; border-radius: 12px; padding: 1.5rem; }
-.stat { font-size: 2.2rem; font-weight: 700; color: #1b2a5b; line-height: 1; }
-.thumb { width: 64px; height: 44px; object-fit: cover; border-radius: 6px; background: #e3e8f6; }
-.msg-text { white-space: pre-wrap; max-width: 420px; }
-.login-wrap { max-width: 400px; margin: 10vh auto; }
-.table > :not(caption) > * > * { vertical-align: middle; }
-
-/* Exam timer */
-.timer-bar {
-  position: sticky; top: 0; z-index: 100;
-  display: flex; justify-content: space-between; align-items: center;
-  background: #fff; border: 1px solid #d9dfee; border-radius: 12px;
-  padding: .75rem 1.25rem; margin-bottom: 1rem;
-  box-shadow: 0 4px 12px rgba(27, 42, 91, .08);
+/* -------------------------------------------------------------
+   Admin & Student Portal Design System
+------------------------------------------------------------- */
+:root {
+  --admin-navy: #0d152e;
+  --admin-navy-soft: #172347;
+  --student-indigo: #101c44;
+  --student-indigo-soft: #1e3272;
+  --brand-yellow: #f7b731;
+  --brand-teal: #0fb9b1;
+  --brand-coral: #fc5c65;
+  --brand-sky: #45aaf2;
+  --brand-purple: #8854d0;
+  --bg-admin: #f4f7fc;
+  --bg-student: #f0f4fd;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-line: #e2e8f0;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 2px 6px rgba(13, 21, 46, 0.05);
+  --shadow-md: 0 8px 20px rgba(13, 21, 46, 0.08);
+  --shadow-lg: 0 16px 36px rgba(13, 21, 46, 0.12);
 }
-.timer-label { font-size: .8rem; color: #5a6683; }
-.timer-value { font-size: 1.9rem; font-weight: 700; color: #1b2a5b; font-variant-numeric: tabular-nums; line-height: 1.1; }
-.timer-low { border-color: #e8505b; }
-.timer-low .timer-value { color: #e8505b; }
-fieldset.q-block legend { width: 100%; }
 
-/* Attendance calendar */
-.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .35rem; }
-.cal-dow { text-align: center; font-size: .75rem; font-weight: 600; color: #5a6683; padding-bottom: .15rem; }
-.cal-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 54px; border-radius: 10px; border: 1px solid #e3e8f6; background: #f8f9fd; color: #5a6683; }
-.cal-num { font-size: .9rem; font-weight: 600; line-height: 1.1; }
-.cal-tag { font-size: .7rem; font-weight: 700; line-height: 1.1; min-height: .8rem; }
-.cal-present { background: #d9f2e1; border-color: #9bd6ae; color: #14602e; }
-.cal-absent { background: #fde0e2; border-color: #f2a6ac; color: #9b1c27; }
-.cal-holiday { background: #fff1c9; border-color: #f0cf72; color: #7a5a00; }
-.cal-future { background: #fff; color: #b3bbcf; }
-.cal-today { outline: 2px solid #1b2a5b; outline-offset: 1px; }
-.cal-legend { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; font-size: .85rem; color: #5a6683; }
-.cal-dot { display: inline-block; width: .8rem; height: .8rem; border-radius: 4px; border: 1px solid #e3e8f6; vertical-align: -1px; }
-.cal-dot.cal-none { background: #f8f9fd; }
-
-/* ---------- Mobile ---------- */
-.admin-nav .nav-link { padding-top: .6rem; padding-bottom: .6rem; }
-
-/* exam answer options: bigger tap targets on every screen */
-.q-block .form-check {
-  padding: .6rem .75rem .6rem 2.6rem;
-  margin-bottom: .5rem;
-  border: 1px solid #e3e8f6;
-  border-radius: 10px;
+body.admin-body {
+  background-color: var(--bg-admin);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+  line-height: 1.6;
 }
-.q-block .form-check .form-check-input { margin-left: -1.8rem; margin-top: .3rem; }
-.q-block .form-check-label { display: block; cursor: pointer; padding: .2rem 0; }
-.q-block .form-check:has(input:checked) { border-color: #1b2a5b; background: #eef2ff; }
 
+body.student-body {
+  background-color: var(--bg-student);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* -------------------------------------------------------------
+   Navbars (Admin & Student)
+------------------------------------------------------------- */
+.admin-nav {
+  background: linear-gradient(135deg, var(--admin-navy) 0%, var(--admin-navy-soft) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.65rem 0;
+  z-index: 1030;
+}
+.student-nav {
+  background: linear-gradient(135deg, var(--student-indigo) 0%, var(--student-indigo-soft) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.65rem 0;
+  z-index: 1030;
+}
+
+.admin-brand-icon, .student-brand-icon {
+  font-size: 1.45rem;
+}
+.admin-brand-title, .student-brand-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-badge-role {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.badge-owner {
+  background: linear-gradient(135deg, #f7b731 0%, #e67e22 100%);
+  color: #101c44;
+}
+.badge-teacher {
+  background: linear-gradient(135deg, #0fb9b1 0%, #0984e3 100%);
+  color: #ffffff;
+}
+.badge-student-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #38bdf8;
+  color: #0c4a6e;
+}
+
+.admin-nav-link, .student-nav-link {
+  color: #cbd5e1 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.85rem !important;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+.admin-nav-link:hover, .student-nav-link:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1);
+}
+.admin-nav-link.active, .student-nav-link.active {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+}
+
+.admin-user-pill {
+  color: #ffffff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.admin-user-pill:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.student-profile-chip {
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.student-chip-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.student-chip-batch {
+  font-size: 0.72rem;
+  color: #93c5fd;
+}
+
+/* -------------------------------------------------------------
+   Hero Greeting Banners
+------------------------------------------------------------- */
+.admin-welcome-banner {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.2rem;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+.admin-welcome-banner::after {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(69, 170, 242, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.student-welcome-banner {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.2rem;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+.student-welcome-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; right: -20px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(247, 183, 49, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* -------------------------------------------------------------
+   Admin Cards & Stat Widgets
+------------------------------------------------------------- */
+.admin-card {
+  background: #ffffff;
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+}
+
+/* Vibrant Stat Cards */
+.stat-card {
+  border-radius: var(--radius-md);
+  padding: 1.4rem;
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.stat-card-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.stat-card-purple {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+.stat-card-blue {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+}
+.stat-card-amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.stat-card-lbl {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
+.stat-card-val {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 4px 0;
+}
+.stat-card-sub {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+.stat-card-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+/* Owner Mini Stat Cards */
+.mini-stat-card {
+  background: #ffffff;
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+.mini-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.mini-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.mini-stat-val {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1;
+}
+.mini-stat-lbl {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.border-left-primary { border-left: 4px solid #3b82f6; }
+.border-left-teal    { border-left: 4px solid #0fb9b1; }
+.border-left-amber   { border-left: 4px solid #f59e0b; }
+.border-left-coral   { border-left: 4px solid #fc5c65; }
+
+/* Student Metric Cards */
+.student-metric-card {
+  background: #ffffff;
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+}
+.student-metric-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.metric-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+  font-size: 1.3rem;
+}
+.stat-orange .metric-icon { background: #ffedd5; color: #ea580c; }
+.stat-green .metric-icon  { background: #dcfce7; color: #16a34a; }
+.stat-blue .metric-icon   { background: #e0f2fe; color: #0284c7; }
+.stat-purple .metric-icon { background: #ede9fe; color: #7c3aed; }
+
+.metric-val {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+.metric-lbl {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.student-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #3730a3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* -------------------------------------------------------------
+   Exam Taking Experience & Timer HUD
+------------------------------------------------------------- */
+.max-w-800 { max-width: 800px; }
+.max-w-600 { max-width: 600px; }
+
+.exam-hud-bar {
+  position: sticky;
+  top: 1rem;
+  z-index: 1020;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(16, 28, 68, 0.08);
+}
+.hud-title {
+  color: var(--text-main);
+}
+.timer-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.timer-value {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.exam-hud-bar.timer-low {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+.exam-hud-bar.timer-low .timer-value {
+  color: #dc2626;
+  animation: pulseWarning 1s infinite alternate;
+}
+@keyframes pulseWarning {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0.75; transform: scale(1.05); }
+}
+
+/* Tactile Question Option Cards */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+@media (min-width: 768px) {
+  .options-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.q-option-card {
+  position: relative;
+  background: #ffffff;
+  border: 2px solid var(--border-line);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.q-option-card:hover {
+  border-color: #93c5fd;
+  background: #f8fafd;
+  transform: translateY(-2px);
+}
+.q-option-card .form-check-input {
+  display: none;
+}
+.q-option-card label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+.option-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+.option-text {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+.q-option-card:has(input:checked) {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+.q-option-card:has(input:checked) .option-badge {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+/* -------------------------------------------------------------
+   Results Screen (Celebration & Badges)
+------------------------------------------------------------- */
+.result-hero-card.passed-bg {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+.result-hero-card.failed-bg {
+  background: linear-gradient(135deg, #dc2626 0%, #f43f5e 100%);
+}
+
+/* -------------------------------------------------------------
+   Attendance Calendar Matrix
+------------------------------------------------------------- */
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .45rem; }
+.cal-dow { text-align: center; font-size: .8rem; font-weight: 700; color: #64748b; padding-bottom: .25rem; }
+.cal-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 58px; border-radius: 12px; border: 1px solid #e2e8f0; background: #ffffff; color: #64748b; transition: all 0.2s ease; }
+.cal-cell:hover { transform: scale(1.05); z-index: 2; box-shadow: var(--shadow-sm); }
+.cal-num { font-size: .95rem; font-weight: 700; line-height: 1.1; }
+.cal-tag { font-size: .75rem; font-weight: 800; line-height: 1.1; margin-top: 2px; }
+.cal-present { background: #dcfce7; border-color: #86efac; color: #15803d; }
+.cal-absent  { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
+.cal-holiday { background: #fef3c7; border-color: #fde68a; color: #b45309; }
+.cal-future  { background: #f8fafc; color: #cbd5e1; }
+.cal-today   { outline: 2.5px solid #2563eb; outline-offset: 1px; font-weight: 800; }
+.cal-legend  { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; font-size: .85rem; color: #64748b; }
+.cal-dot     { display: inline-block; width: .85rem; height: .85rem; border-radius: 4px; border: 1px solid #cbd5e1; vertical-align: -2px; }
+
+/* -------------------------------------------------------------
+   Login Page Styling
+------------------------------------------------------------- */
+.login-page-body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.student-login-bg {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+.login-wrapper {
+  width: 100%;
+  max-width: 440px;
+}
+.login-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.login-card-header {
+  padding: 2.5rem 1.5rem 1rem;
+  background: #f8fafd;
+  border-bottom: 1px solid var(--border-line);
+}
+.login-icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* -------------------------------------------------------------
+   Responsive Mobile Adjustments
+------------------------------------------------------------- */
 @media (max-width: 767.98px) {
-  main.container { padding-left: 1rem; padding-right: 1rem; }
-  .admin-card { padding: 1rem; }
-  .form-control, .form-select { font-size: 16px; } /* stops iOS zooming into fields */
-  .admin-card form button[type="submit"].btn-primary { width: 100%; }
-  .admin-card form .btn-link { display: block; text-align: center; }
-  .login-wrap { margin-top: 6vh; }
-  .stat { font-size: 1.8rem; }
-  .cal-cell { min-height: 44px; border-radius: 8px; }
-  .cal-grid { gap: .25rem; }
-
-  /* tables become cards */
-  .table-stack.is-stacked thead { display: none; }
-  .table-stack.is-stacked,
-  .table-stack.is-stacked > tbody,
-  .table-stack.is-stacked > tbody > tr,
-  .table-stack.is-stacked > tbody > tr > td { display: block; width: 100%; }
-  .table-stack.is-stacked > tbody > tr {
-    border: 1px solid #d9dfee;
-    border-radius: 12px;
-    padding: .4rem .9rem;
-    margin-bottom: .75rem;
-    background: #fff;
+  .admin-welcome-banner, .student-welcome-banner {
+    padding: 1.5rem;
   }
-  .table-stack.is-stacked > tbody > tr > td {
-    position: relative;
-    padding: .45rem 0 .45rem 38%;
-    min-height: 2rem;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-    text-align: left !important;
-    white-space: normal !important;
-    word-break: break-word;
+  .cal-cell {
+    min-height: 46px;
+    border-radius: 8px;
   }
-  .table-stack.is-stacked > tbody > tr > td + td { border-top: 1px solid #eef1f8; }
-  .table-stack.is-stacked > tbody > tr > td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 0; top: .5rem;
-    width: 34%;
-    font-size: .8rem;
-    font-weight: 600;
-    color: #5a6683;
+  .stat-card-val {
+    font-size: 2rem;
   }
-  .table-stack.is-stacked > tbody > tr > td[data-label=""] { padding-left: 0; }
-  .table-stack.is-stacked > tbody > tr > td[data-label=""]::before { content: none; }
-  .table-stack.is-stacked .btn { margin: .15rem .25rem .15rem 0; }
-  .table-stack.is-stacked form.d-inline { display: inline-block !important; width: auto; }
-  .table-stack.is-stacked .msg-text { max-width: none; }
-
-  /* exam page */
-  .timer-bar { padding: .6rem .9rem; border-radius: 10px; }
-  .timer-value { font-size: 1.5rem; }
-  .timer-bar strong { font-size: .95rem; }
+  .exam-hud-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .hud-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-line);
+    padding-top: 0.5rem;
+  }
+  .timer-value {
+    font-size: 1.75rem;
+  }
 }

@@ -10,11 +10,15 @@ const slides = [
   { image: 'slide3.jpeg', tone: 'coral', title: 'Compete. Celebrate. Grow.', text: 'Join our championships, workshops and annual day.', cta: { label: 'View events', href: '/events' } }
 ];
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
+  let events = [];
   try {
-    const [events] = await db.query('SELECT * FROM events WHERE event_date >= NOW() ORDER BY event_date ASC LIMIT 3');
-    res.render('home', { title: 'Home', slides, events });
-  } catch (err) { next(err); }
+    const [rows] = await db.query('SELECT * FROM events WHERE event_date >= NOW() ORDER BY event_date ASC LIMIT 3');
+    events = rows;
+  } catch (err) {
+    console.warn('[Pages] Could not load events for homepage (database may be connecting):', err.message);
+  }
+  res.render('home', { title: 'Home', slides, events });
 });
 
 router.get('/about', async (req, res) => {
@@ -23,16 +27,23 @@ router.get('/about', async (req, res) => {
     const [rows] = await db.query('SELECT type, name, note FROM branches ORDER BY sort_order, id');
     mainBranches = rows.filter(r => r.type === 'main');
     franchises = rows.filter(r => r.type === 'franchise');
-  } catch (err) { console.error('Could not load branches (run branches.sql):', err.message); }
+  } catch (err) {
+    console.warn('[Pages] Could not load branches:', err.message);
+  }
   res.render('about', { title: 'About us', mainBranches, franchises });
 });
 
-router.get('/events', async (req, res, next) => {
+router.get('/events', async (req, res) => {
+  let upcoming = [], past = [];
   try {
-    const [upcoming] = await db.query('SELECT * FROM events WHERE event_date >= NOW() ORDER BY event_date ASC');
-    const [past] = await db.query('SELECT * FROM events WHERE event_date < NOW() ORDER BY event_date DESC LIMIT 12');
-    res.render('events', { title: 'Events', upcoming, past });
-  } catch (err) { next(err); }
+    const [u] = await db.query('SELECT * FROM events WHERE event_date >= NOW() ORDER BY event_date ASC');
+    const [p] = await db.query('SELECT * FROM events WHERE event_date < NOW() ORDER BY event_date DESC LIMIT 12');
+    upcoming = u;
+    past = p;
+  } catch (err) {
+    console.warn('[Pages] Could not load events list:', err.message);
+  }
+  res.render('events', { title: 'Events', upcoming, past });
 });
 
 router.get('/contact', async (req, res, next) => {

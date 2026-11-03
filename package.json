@@ -5,8 +5,12 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "build": "echo 'Build OK'",
     "dev": "node --watch app.js",
     "create-admin": "node create-admin.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

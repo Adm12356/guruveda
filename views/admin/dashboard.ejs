@@ -1,41 +1,185 @@
 <%- include('partials/header') %>
-<h1 class="h3 mb-1">Welcome, <%= admin.name || admin.username %></h1>
-<p class="text-muted mb-4"><%= isOwner ? 'Main account of the institute' : 'Teacher account' %></p>
 
-<h2 class="h5 mb-3"><%= isOwner ? 'Your own classes' : 'Your classes' %></h2>
+<!-- Admin Greeting Banner -->
+<div class="admin-welcome-banner mb-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 mb-2">
+        <i class="bi bi-shield-check me-1"></i><%= isOwner ? 'Institute Owner Portal' : 'Teacher Portal' %>
+      </span>
+      <h1 class="h2 text-white mb-1">Welcome back, <%= admin.name || admin.username %> 👋</h1>
+      <p class="text-white text-opacity-75 mb-0">Here is the active summary of your students, classes, and tests.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="/admin/attendance" class="btn btn-warning rounded-pill px-3 py-2 fw-semibold">
+        <i class="bi bi-calendar-check-fill me-1"></i>Mark Attendance
+      </a>
+      <a href="/admin/students/new" class="btn btn-light rounded-pill px-3 py-2 fw-semibold">
+        <i class="bi bi-person-plus-fill me-1"></i>Add Student
+      </a>
+      <a href="/admin/exams/new" class="btn btn-outline-light rounded-pill px-3 py-2 fw-semibold">
+        <i class="bi bi-plus-circle me-1"></i>New Exam
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- My Classes Summary -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h2 class="h5 mb-0 text-dark fw-bold"><i class="bi bi-folder2-open me-2 text-primary"></i><%= isOwner ? 'Your Classes' : 'My Classes & Students' %></h2>
+</div>
+
 <div class="row g-3 mb-4">
-  <div class="col-md-4"><a class="text-decoration-none" href="/admin/batches"><div class="admin-card"><div class="stat"><%= mine.batches %></div><div class="text-muted">Active batches</div></div></a></div>
-  <div class="col-md-4"><a class="text-decoration-none" href="/admin/students"><div class="admin-card"><div class="stat"><%= mine.students %></div><div class="text-muted">Students</div></div></a></div>
-  <div class="col-md-4"><a class="text-decoration-none" href="/admin/exams"><div class="admin-card"><div class="stat"><%= mine.exams %></div><div class="text-muted">Exams</div></div></a></div>
+  <div class="col-md-4">
+    <a class="text-decoration-none" href="/admin/batches">
+      <div class="stat-card stat-card-purple">
+        <div class="stat-card-inner">
+          <div>
+            <div class="stat-card-lbl">Active Batches</div>
+            <div class="stat-card-val"><%= mine.batches %></div>
+            <div class="stat-card-sub">Batches assigned to you</div>
+          </div>
+          <div class="stat-card-icon"><i class="bi bi-collection"></i></div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a class="text-decoration-none" href="/admin/students">
+      <div class="stat-card stat-card-blue">
+        <div class="stat-card-inner">
+          <div>
+            <div class="stat-card-lbl">Total Students</div>
+            <div class="stat-card-val"><%= mine.students %></div>
+            <div class="stat-card-sub">Students under your care</div>
+          </div>
+          <div class="stat-card-icon"><i class="bi bi-people"></i></div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a class="text-decoration-none" href="/admin/exams">
+      <div class="stat-card stat-card-amber">
+        <div class="stat-card-inner">
+          <div>
+            <div class="stat-card-lbl">Exams Created</div>
+            <div class="stat-card-val"><%= mine.exams %></div>
+            <div class="stat-card-sub">Tests & assessments</div>
+          </div>
+          <div class="stat-card-icon"><i class="bi bi-journal-text"></i></div>
+        </div>
+      </div>
+    </a>
+  </div>
 </div>
 
 <% if (site) { %>
-<h2 class="h5 mb-3">Whole institute</h2>
-<div class="row g-3 mb-4">
-  <div class="col-6 col-lg-3"><a class="text-decoration-none" href="/admin/teachers"><div class="admin-card"><div class="stat"><%= site.teachers %></div><div class="text-muted">Active teachers</div></div></a></div>
-  <div class="col-6 col-lg-3"><a class="text-decoration-none" href="/admin/teachers"><div class="admin-card"><div class="stat"><%= site.students %></div><div class="text-muted">Students in total</div></div></a></div>
-  <div class="col-6 col-lg-3"><a class="text-decoration-none" href="/admin/events"><div class="admin-card"><div class="stat"><%= site.events %></div><div class="text-muted">Upcoming events</div></div></a></div>
-  <div class="col-6 col-lg-3"><a class="text-decoration-none" href="/admin/messages"><div class="admin-card"><div class="stat"><%= site.messages %></div><div class="text-muted">Messages received</div></div></a></div>
+<!-- Owner: Whole Institute Overview -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h2 class="h5 mb-0 text-dark fw-bold"><i class="bi bi-buildings me-2 text-teal"></i>Whole Institute Overview</h2>
+  <span class="badge text-bg-light border text-muted">Owner Privileges</span>
 </div>
 
-<div class="admin-card">
-  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-    <h2 class="h5 mb-0">Latest messages</h2>
-    <a href="/admin/messages">View all</a>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <a class="text-decoration-none" href="/admin/teachers">
+      <div class="mini-stat-card border-left-primary">
+        <div class="mini-stat-icon text-primary"><i class="bi bi-person-badge"></i></div>
+        <div>
+          <div class="mini-stat-val"><%= site.teachers %></div>
+          <div class="mini-stat-lbl">Active Teachers</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a class="text-decoration-none" href="/admin/students">
+      <div class="mini-stat-card border-left-teal">
+        <div class="mini-stat-icon text-teal"><i class="bi bi-mortarboard"></i></div>
+        <div>
+          <div class="mini-stat-val"><%= site.students %></div>
+          <div class="mini-stat-lbl">Total Students</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a class="text-decoration-none" href="/admin/events">
+      <div class="mini-stat-card border-left-amber">
+        <div class="mini-stat-icon text-warning"><i class="bi bi-calendar-event"></i></div>
+        <div>
+          <div class="mini-stat-val"><%= site.events %></div>
+          <div class="mini-stat-lbl">Upcoming Events</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a class="text-decoration-none" href="/admin/messages">
+      <div class="mini-stat-card border-left-coral">
+        <div class="mini-stat-icon text-danger"><i class="bi bi-chat-dots"></i></div>
+        <div>
+          <div class="mini-stat-val"><%= site.messages %></div>
+          <div class="mini-stat-lbl">Inquiries Received</div>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Latest Inquiries Table -->
+<div class="admin-card mb-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 pb-2 border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-envelope-open-fill text-primary fs-5"></i>
+      <h2 class="h5 mb-0 fw-bold">Recent Website Inquiries</h2>
+    </div>
+    <a href="/admin/messages" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+      View All Messages <i class="bi bi-arrow-right ms-1"></i>
+    </a>
   </div>
   <% if (site.recent.length === 0) { %>
-    <p class="text-muted mb-0">No messages yet.</p>
+    <div class="p-4 text-center text-muted">
+      <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+      No inquiries received yet. They will appear here when parents contact you through the website.
+    </div>
   <% } else { %>
     <div class="table-responsive">
-      <table class="table mb-0 table-stack">
-        <thead><tr><th>Date</th><th>Name</th><th>Phone</th><th>Batch</th></tr></thead>
+      <table class="table align-middle table-hover mb-0 table-stack">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Message</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
         <tbody>
           <% site.recent.forEach(m => { %>
             <tr>
-              <td><%= new Date(m.created_at).toLocaleString('en-IN') %></td>
-              <td><%= m.name %></td>
-              <td><a href="tel:<%= m.phone %>"><%= m.phone %></a></td>
-              <td><%= m.batch_interest || '-' %></td>
+              <td>
+                <span class="small text-muted d-block"><%= new Date(m.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+                <span class="small text-muted"><%= new Date(m.created_at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) %></span>
+              </td>
+              <td><strong><%= m.name %></strong></td>
+              <td>
+                <a href="tel:<%= m.phone %>" class="badge text-bg-light border text-primary text-decoration-none p-2">
+                  <i class="bi bi-telephone-fill me-1"></i><%= m.phone %>
+                </a>
+              </td>
+              <td>
+                <div class="msg-text text-truncate-2 small text-muted"><%= m.message || '-' %></div>
+              </td>
+              <td class="text-end">
+                <a href="tel:<%= m.phone %>" class="btn btn-sm btn-outline-success rounded-pill px-2" title="Call parent">
+                  <i class="bi bi-telephone"></i>
+                </a>
+                <a href="https://wa.me/<%= m.phone.replace(/[^0-9]/g, '') %>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success rounded-pill px-2" title="WhatsApp">
+                  <i class="bi bi-whatsapp"></i>
+                </a>
+              </td>
             </tr>
           <% }) %>
         </tbody>
@@ -44,4 +188,5 @@
   <% } %>
 </div>
 <% } %>
+
 <%- include('partials/footer') %>

@@ -1,37 +1,141 @@
 <%- include('partials/header') %>
-<h1 class="h3 mb-1">Welcome, <%= student.name %></h1>
-<p class="text-muted mb-4">Batch: <%= student.batch_name || 'Not assigned yet' %></p>
 
+<!-- Student Friendly Hero Banner -->
+<div class="student-welcome-banner mb-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-1">
+          <i class="bi bi-star-fill text-warning me-1"></i><%= student.batch_name || 'Active Student' %>
+        </span>
+      </div>
+      <h1 class="h2 text-white mb-1">Hello, <%= student.name %>! 🚀</h1>
+      <p class="text-white text-opacity-85 mb-0">Ready to train your brain and slide some beads today?</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/student/exams" class="btn btn-warning rounded-pill px-4 py-2 fw-bold shadow-sm">
+        <i class="bi bi-pencil-square me-2"></i>View My Exams
+      </a>
+      <a href="/student/attendance" class="btn btn-light rounded-pill px-4 py-2 fw-semibold">
+        <i class="bi bi-calendar-check me-2"></i>My Attendance
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Today's Attendance Highlight Card -->
+<div class="today-status-strip alert alert-<%= todayStatusClass(attToday.status) %> d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4 p-3 rounded-4 shadow-sm">
+  <div class="d-flex align-items-center gap-3">
+    <span class="fs-2"><%= todayStatusEmoji(attToday.status) %></span>
+    <div>
+      <div class="fw-bold fs-6">Today's Attendance Status: <%= ({ present: 'Marked Present', absent: 'Marked Absent', holiday: 'School Holiday', none: 'Class in Session / Not Marked Yet' })[attToday.status] %></div>
+      <small class="text-muted"><%= attToday.status === 'holiday' && attToday.note && attToday.note !== 'Holiday' ? attToday.note : 'Keep up regular practice to master the higher levels!' %></small>
+    </div>
+  </div>
+  <a href="/student/attendance" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Full Month</a>
+</div>
+
+<!-- Gamified Stat Cards -->
 <div class="row g-3 mb-4">
-  <div class="col-md-4"><a class="text-decoration-none" href="/student/exams"><div class="admin-card"><div class="stat"><%= pending %></div><div class="text-muted">Exams to take</div></div></a></div>
-  <div class="col-md-4"><a class="text-decoration-none" href="/student/results"><div class="admin-card"><div class="stat"><%= done %></div><div class="text-muted">Exams completed</div></div></a></div>
-  <div class="col-md-4"><div class="admin-card"><div class="stat"><%= avg === null ? '-' : avg + '%' %></div><div class="text-muted">Average of recent results</div></div></div>
-  <div class="col-md-6"><a class="text-decoration-none" href="/student/attendance"><div class="admin-card"><div class="stat"><%= attTotal.percent === null ? '-' : attTotal.percent + '%' %></div><div class="text-muted">Attendance (<%= attTotal.present %> present, <%= attTotal.absent %> absent)</div></div></a></div>
-  <div class="col-md-6"><a class="text-decoration-none" href="/student/attendance"><div class="admin-card"><div class="stat fs-3"><%= ({ present: 'Present', absent: 'Absent', holiday: 'Holiday', none: 'Not marked yet' })[attToday.status] %></div><div class="text-muted">Today<%= attToday.status === 'holiday' && attToday.note && attToday.note !== 'Holiday' ? ' - ' + attToday.note : '' %></div></div></a></div>
+  <div class="col-md-3 col-6">
+    <a class="text-decoration-none" href="/student/exams">
+      <div class="student-metric-card stat-orange">
+        <div class="metric-icon"><i class="bi bi-hourglass-split"></i></div>
+        <div class="metric-val"><%= pending %></div>
+        <div class="metric-lbl">Pending Tests</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 col-6">
+    <a class="text-decoration-none" href="/student/results">
+      <div class="student-metric-card stat-green">
+        <div class="metric-icon"><i class="bi bi-trophy-fill"></i></div>
+        <div class="metric-val"><%= done %></div>
+        <div class="metric-lbl">Completed Tests</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="student-metric-card stat-blue">
+      <div class="metric-icon"><i class="bi bi-speedometer"></i></div>
+      <div class="metric-val"><%= avg === null ? '-' : avg + '%' %></div>
+      <div class="metric-lbl">Average Score</div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <a class="text-decoration-none" href="/student/attendance">
+      <div class="student-metric-card stat-purple">
+        <div class="metric-icon"><i class="bi bi-calendar2-check-fill"></i></div>
+        <div class="metric-val"><%= attTotal.percent === null ? '-' : attTotal.percent + '%' %></div>
+        <div class="metric-lbl">Attendance Rate</div>
+      </div>
+    </a>
+  </div>
 </div>
 
 <% if (!student.batch_name) { %>
-  <div class="alert alert-info">You have not been assigned to a batch yet, so no exams are available. Please contact your teacher.</div>
+  <div class="alert alert-info rounded-4 border-0 shadow-sm mb-4">
+    <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+    You have not been assigned to a batch yet, so no exams are available. Please ask your teacher to assign you to a batch.
+  </div>
 <% } %>
 
-<div class="admin-card">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h5 mb-0">Recent results</h2>
-    <a href="/student/results">All results</a>
+<!-- Recent Exam Results -->
+<div class="admin-card mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-award-fill text-warning fs-5"></i>
+      <h2 class="h5 mb-0 fw-bold">Recent Test Results</h2>
+    </div>
+    <a href="/student/results" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+      All Results <i class="bi bi-arrow-right ms-1"></i>
+    </a>
   </div>
   <% if (recent.length === 0) { %>
-    <p class="text-muted mb-0">No results yet. <a href="/student/exams">Go to exams</a></p>
+    <div class="p-5 text-center bg-light rounded-4">
+      <i class="bi bi-journal-text display-4 text-muted mb-3 d-block"></i>
+      <h3 class="h5 mb-1">No exam results yet</h3>
+      <p class="text-muted mb-3">When you complete an online exam, your scores and review will appear here.</p>
+      <a href="/student/exams" class="btn btn-primary rounded-pill px-4">Go to Available Exams</a>
+    </div>
   <% } else { %>
     <div class="table-responsive">
-      <table class="table mb-0 table-stack">
-        <thead><tr><th>Exam</th><th>Score</th><th>Percentage</th><th>Result</th></tr></thead>
+      <table class="table align-middle table-hover mb-0 table-stack">
+        <thead class="table-light">
+          <tr>
+            <th>Exam Name</th>
+            <th>Score</th>
+            <th>Percentage</th>
+            <th>Result</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
         <tbody>
-          <% recent.forEach(r => { const pct = fmt.percent(r.score, r.total_marks); %>
+          <% recent.forEach(r => { const pct = fmt.percent(r.score, r.total_marks); const passed = pct >= r.pass_percent; %>
             <tr>
-              <td><a href="/student/results/<%= r.exam_id %>"><%= r.title %></a></td>
-              <td><%= r.score %> / <%= r.total_marks %></td>
-              <td><%= pct %>%</td>
-              <td><span class="badge text-bg-<%= pct >= r.pass_percent ? 'success' : 'danger' %>"><%= pct >= r.pass_percent ? 'Pass' : 'Fail' %></span></td>
+              <td>
+                <div class="fw-bold"><%= r.title %></div>
+                <small class="text-muted"><%= new Date(r.submitted_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></small>
+              </td>
+              <td><span class="fw-semibold"><%= r.score %></span> / <%= r.total_marks %></td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="progress flex-grow-1" style="height: 8px; width: 80px;">
+                    <div class="progress-bar <%= passed ? 'bg-success' : 'bg-danger' %>" role="progressbar" style="width: <%= Math.min(100, pct) %>%;"></div>
+                  </div>
+                  <span class="small fw-bold"><%= pct %>%</span>
+                </div>
+              </td>
+              <td>
+                <span class="badge rounded-pill <%= passed ? 'text-bg-success' : 'text-bg-danger' %> px-3 py-1">
+                  <i class="bi <%= passed ? 'bi-check-circle-fill' : 'bi-x-circle-fill' %> me-1"></i><%= passed ? 'Passed' : 'Needs Practice' %>
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="/student/results/<%= r.exam_id %>">
+                  <i class="bi bi-eye me-1"></i>Review
+                </a>
+              </td>
             </tr>
           <% }) %>
         </tbody>
@@ -39,4 +143,19 @@
     </div>
   <% } %>
 </div>
+
+<%
+function todayStatusClass(st) {
+  if (st === 'present') return 'success';
+  if (st === 'absent') return 'danger';
+  if (st === 'holiday') return 'warning';
+  return 'secondary';
+}
+function todayStatusEmoji(st) {
+  if (st === 'present') return '🎉';
+  if (st === 'absent') return '⚠️';
+  if (st === 'holiday') return '🏖️';
+  return '📅';
+}
+%>
 <%- include('partials/footer') %>

@@ -1,34 +1,54 @@
 </main>
 
 <footer class="site-footer">
-  <div class="container">
-    <%- include('beads') %>
-    <div class="row gy-4 pt-4">
-      <div class="col-md-5">
-        <h2 class="h5 footer-title"><%= site.name %></h2>
-        <p><%= site.tagline %></p>
-        <img src="/images/logo.jpeg" style="margin-left: 60px;" alt="<%= site.name %> logo" class="footer-logo" onerror="this.style.display='none'">
+  <div class="footer-wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 80" fill="none" preserveAspectRatio="none">
+      <path d="M0,32L60,42.7C120,53,240,75,360,69.3C480,64,600,32,720,26.7C840,21,960,43,1080,48C1200,53,1320,43,1380,37.3L1440,32L1440,80L1380,80C1320,80,1200,80,1080,80C960,80,840,80,720,80C600,80,480,80,360,80C240,80,120,80,60,80L0,80Z" fill="currentColor"></path>
+    </svg>
+  </div>
+  <div class="container footer-content">
+    <div class="d-flex justify-content-center mb-4">
+      <%- include('beads') %>
+    </div>
+    <div class="row gy-4 pt-2">
+      <div class="col-lg-5 col-md-6">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <img src="/images/logo.jpeg" alt="<%= site.name %>" class="footer-logo" width="48" height="48" onerror="this.style.display='none'">
+          <h2 class="h5 footer-title mb-0"><%= site.name %></h2>
+        </div>
+        <p class="footer-tagline"><%= site.tagline %></p>
+        <p class="footer-desc">Empowering young minds with speed arithmetic, high concentration, and deep cognitive confidence through proven abacus techniques.</p>
+        <div class="d-flex gap-2 footer-badges mt-3">
+          <span class="badge-chip"><i class="bi bi-patch-check-fill text-warning me-1"></i>Certified Trainers</span>
+          <span class="badge-chip"><i class="bi bi-star-fill text-warning me-1"></i>Ages 5 - 14</span>
+        </div>
       </div>
-      <div class="col-6 col-md-3">
-        <h2 class="h6 footer-title">Pages</h2>
-        <ul class="list-unstyled mb-0">
-          <li><a href="/">Home</a></li>
-          <li><a href="/about">About</a></li>
-          <li><a href="/events">Events</a></li>
-          <li><a href="/contact">Contact</a></li>
+      <div class="col-6 col-lg-3 col-md-3">
+        <h2 class="h6 footer-title footer-heading">Explore</h2>
+        <ul class="list-unstyled footer-links mb-0">
+          <li><a href="/"><i class="bi bi-chevron-right me-1 small"></i>Home</a></li>
+          <li><a href="/about"><i class="bi bi-chevron-right me-1 small"></i>About Us & Trainers</a></li>
+          <li><a href="/events"><i class="bi bi-chevron-right me-1 small"></i>Events & Camps</a></li>
+          <li><a href="/contact"><i class="bi bi-chevron-right me-1 small"></i>Contact & Demo Class</a></li>
+          <li><a href="/student/login"><i class="bi bi-chevron-right me-1 small"></i>Student Portal Login</a></li>
         </ul>
       </div>
-      <div class="col-6 col-md-4">
-        <h2 class="h6 footer-title">Visit or call</h2>
-        <address class="mb-0">
-          <%= site.address %><br>
-          <a href="tel:<%= site.phone.replace(/\s/g, '') %>"><%= site.phone %></a><br>
-          <a href="mailto:<%= site.email %>"><%= site.email %></a><br>
-          <%= site.hours %>
+      <div class="col-6 col-lg-4 col-md-3">
+        <h2 class="h6 footer-title footer-heading">Get in Touch</h2>
+        <address class="footer-address mb-0">
+          <p class="mb-2"><i class="bi bi-geo-alt-fill text-warning me-2"></i><%= site.address %></p>
+          <p class="mb-2"><i class="bi bi-telephone-fill text-warning me-2"></i><a href="tel:<%= site.phone.replace(/\s/g, '') %>"><%= site.phone %></a></p>
+          <p class="mb-2"><i class="bi bi-envelope-fill text-warning me-2"></i><a href="mailto:<%= site.email %>"><%= site.email %></a></p>
+          <p class="mb-0"><i class="bi bi-clock-fill text-warning me-2"></i><%= site.hours %></p>
         </address>
       </div>
     </div>
-    <p class="small copyright mb-0">&copy; <%= new Date().getFullYear() %> <%= site.name %>. All rights reserved.</p>
+    <div class="footer-bottom mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <p class="small copyright mb-0">&copy; <%= new Date().getFullYear() %> <%= site.name %>. Built with love for young minds.</p>
+      <div class="small">
+        <a href="/admin/login" class="text-white-50 text-decoration-none"><i class="bi bi-shield-lock me-1"></i>Staff Portal</a>
+      </div>
+    </div>
   </div>
 </footer>
 

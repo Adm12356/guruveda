@@ -1,35 +1,82 @@
 <%- include('partials/header') %>
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-  <h1 class="h3 mb-0">Exams</h1>
-  <a class="btn btn-primary" href="/admin/exams/new">Add exam</a>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1 fw-bold text-dark"><i class="bi bi-journal-check text-primary me-2"></i>Exams & Assessments</h1>
+    <p class="text-muted small mb-0">Create tests, manage questions, publish to batches, and view student submissions.</p>
+  </div>
+  <a class="btn btn-primary rounded-pill px-4 shadow-sm" href="/admin/exams/new">
+    <i class="bi bi-plus-circle-fill me-1"></i>Create Exam
+  </a>
 </div>
-<div class="admin-card">
+
+<div class="admin-card shadow-sm">
   <% if (exams.length === 0) { %>
-    <p class="text-muted mb-0">No exams yet. Create one, add questions, then publish it.</p>
+    <div class="p-5 text-center">
+      <i class="bi bi-journal-plus display-4 text-muted mb-3 d-block"></i>
+      <h3 class="h5">No exams created yet</h3>
+      <p class="text-muted mb-3">Create your first exam, configure duration & pass marks, add questions, then publish it.</p>
+      <a class="btn btn-primary rounded-pill px-4" href="/admin/exams/new">Create New Exam</a>
+    </div>
   <% } else { %>
     <div class="table-responsive">
-      <table class="table mb-0 table-stack">
-        <thead><tr><th>Exam</th><th>Batch</th><th>Timer</th><th>Questions</th><th>Submitted</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+      <table class="table align-middle table-hover mb-0 table-stack">
+        <thead class="table-light">
+          <tr>
+            <th>Exam Title</th>
+            <th>Target Batch</th>
+            <th>Timer</th>
+            <th>Questions</th>
+            <th>Submissions</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
         <tbody>
           <% exams.forEach(e => { %>
             <tr>
-              <td><strong><%= e.title %></strong></td>
-              <td><%= e.batch_name %></td>
-              <td><%= e.duration_minutes %> min</td>
-              <td><%= e.question_count %> <small class="text-muted">(<%= e.total_marks %> marks)</small></td>
-              <td><%= e.submitted_count %></td>
-              <td><span class="badge text-bg-<%= e.is_published ? 'success' : 'secondary' %>"><%= e.is_published ? 'Published' : 'Draft' %></span></td>
+              <td>
+                <strong class="text-dark d-block"><%= e.title %></strong>
+                <% if (e.description) { %><small class="text-muted text-truncate-2 d-inline-block" style="max-width: 240px;"><%= e.description %></small><% } %>
+              </td>
+              <td>
+                <span class="badge text-bg-light border text-dark"><i class="bi bi-collection me-1 text-primary"></i><%= e.batch_name %></span>
+              </td>
+              <td>
+                <span class="badge text-bg-light border text-muted"><i class="bi bi-stopwatch me-1"></i><%= e.duration_minutes %> min</span>
+              </td>
+              <td>
+                <span class="fw-semibold"><%= e.question_count %></span> <small class="text-muted">(<%= e.total_marks %> marks)</small>
+              </td>
+              <td>
+                <span class="badge text-bg-info bg-opacity-10 text-info fw-bold px-2 py-1"><%= e.submitted_count %> completed</span>
+              </td>
+              <td>
+                <span class="badge rounded-pill <%= e.is_published ? 'text-bg-success' : 'text-bg-secondary' %> px-3 py-1">
+                  <i class="bi <%= e.is_published ? 'bi-globe' : 'bi-eye-slash' %> me-1"></i><%= e.is_published ? 'Published' : 'Draft' %>
+                </span>
+              </td>
               <td class="text-end text-nowrap">
-                <a class="btn btn-sm btn-outline-secondary" href="/admin/exams/<%= e.id %>/questions">Questions</a>
-                <a class="btn btn-sm btn-outline-secondary" href="/admin/exams/<%= e.id %>/results">Results</a>
-                <a class="btn btn-sm btn-outline-primary" href="/admin/exams/<%= e.id %>/edit">Edit</a>
+                <a class="btn btn-sm btn-outline-secondary rounded-pill px-2 me-1" href="/admin/exams/<%= e.id %>/questions" title="Manage questions">
+                  <i class="bi bi-question-circle me-1"></i>Questions
+                </a>
+                <a class="btn btn-sm btn-outline-info rounded-pill px-2 me-1" href="/admin/exams/<%= e.id %>/results" title="View results">
+                  <i class="bi bi-bar-chart-line me-1"></i>Results
+                </a>
+                <a class="btn btn-sm btn-outline-primary rounded-pill px-2 me-1" href="/admin/exams/<%= e.id %>/edit" title="Edit settings">
+                  <i class="bi bi-pencil"></i>
+                </a>
                 <form method="POST" action="/admin/exams/<%= e.id %>/publish" class="d-inline">
                   <input type="hidden" name="_csrf" value="<%= csrf %>">
-                  <button class="btn btn-sm btn-outline-success" type="submit"><%= e.is_published ? 'Unpublish' : 'Publish' %></button>
+                  <button class="btn btn-sm <%= e.is_published ? 'btn-outline-warning' : 'btn-outline-success' %> rounded-pill px-2 me-1" type="submit">
+                    <%= e.is_published ? 'Hide' : 'Publish' %>
+                  </button>
                 </form>
                 <form method="POST" action="/admin/exams/<%= e.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this exam with all its questions and results?')">
                   <input type="hidden" name="_csrf" value="<%= csrf %>">
-                  <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                  <button class="btn btn-sm btn-outline-danger rounded-pill px-2" type="submit" title="Delete exam">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </form>
               </td>
             </tr>
@@ -39,4 +86,5 @@
     </div>
   <% } %>
 </div>
+
 <%- include('partials/footer') %>

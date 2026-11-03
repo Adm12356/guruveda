@@ -1,11 +1,25 @@
 <%- include('partials/header') %>
-<%- include('partials/page-header', { heading: 'Events', sub: 'Championships, workshops and celebrations at our centre.' }) %>
+<%- include('partials/page-header', { heading: 'Events & Camps', sub: 'Championships, speed-maths workshops, and annual celebrations.' }) %>
 
 <section class="section">
   <div class="container">
-    <h2 class="section-title">Upcoming</h2>
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+      <div>
+        <div class="section-badge mb-1"><i class="bi bi-calendar-heart me-1"></i>Mark Your Calendar</div>
+        <h2 class="section-title mb-0">Upcoming Events</h2>
+      </div>
+      <a href="/contact" class="btn btn-bead">
+        <i class="bi bi-plus-circle me-1"></i>Register for an Event
+      </a>
+    </div>
+
     <% if (upcoming.length === 0) { %>
-      <p>No events are scheduled right now. Check back soon.</p>
+      <div class="empty-state-box p-5 text-center bg-light rounded-4 border border-light-subtle">
+        <i class="bi bi-calendar2-x display-4 text-muted mb-3 d-block"></i>
+        <h3 class="h5">No upcoming events right now</h3>
+        <p class="text-muted mb-3">We regularly organise seasonal camps, parent workshops, and mental maths tournaments.</p>
+        <a href="/contact" class="btn btn-outline-ink btn-sm">Contact us to be notified</a>
+      </div>
     <% } else { %>
       <ul class="event-list list-unstyled mb-0">
         <% upcoming.forEach(e => { %><%- include('partials/event-row', { e }) %><% }) %>
@@ -14,20 +28,46 @@
   </div>
 </section>
 
-<section class="section section-tint">
+<section class="section section-tint py-5">
   <div class="container">
-    <h2 class="section-title">Past events</h2>
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+      <div>
+        <div class="section-badge mb-1"><i class="bi bi-clock-history me-1"></i>Memories</div>
+        <h2 class="section-title mb-0">Past Highlights & Celebrations</h2>
+      </div>
+      <span class="badge text-bg-light border px-3 py-2 text-muted">Hall of Fame</span>
+    </div>
+
     <% if (past.length === 0) { %>
-      <p class="mb-0">Past events will appear here.</p>
+      <div class="p-4 text-center text-muted">Past tournaments and camp photos will be showcased here.</div>
     <% } else { %>
       <div class="row g-4">
         <% past.forEach(e => { %>
           <div class="col-sm-6 col-lg-4">
-            <article class="past-card h-100">
-              <div class="photo-slot photo-slot-sm" style="--img: url('/images/events/<%= e.image || 'none' %>');" role="img" aria-label="<%= e.title %>"></div>
-              <div class="p-3">
-                <h3 class="h6 mb-1"><%= e.title %></h3>
-                <p class="meta mb-0"><%= new Date(e.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
+            <article class="past-card h-100 shadow-sm">
+              <div class="past-photo-wrapper" style="--img: url('/images/events/<%= e.image || 'none' %>');" role="img" aria-label="<%= e.title %>">
+                <% if (!e.image) { %>
+                  <div class="placeholder-graphic">
+                    <i class="bi bi-trophy-fill display-5 text-warning opacity-75"></i>
+                  </div>
+                <% } %>
+                <div class="past-date-pill">
+                  <i class="bi bi-calendar3 me-1"></i>
+                  <%= new Date(e.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                </div>
+              </div>
+              <div class="p-3 d-flex flex-column justify-content-between">
+                <div>
+                  <h3 class="h6 mb-2 past-title"><%= e.title %></h3>
+                  <% if (e.description) { %>
+                    <p class="small text-muted mb-2 text-truncate-2"><%= e.description %></p>
+                  <% } %>
+                </div>
+                <% if (e.location) { %>
+                  <div class="past-location small text-muted pt-2 border-top border-light-subtle">
+                    <i class="bi bi-geo-alt me-1 text-danger"></i><%= e.location %>
+                  </div>
+                <% } %>
               </div>
             </article>
           </div>

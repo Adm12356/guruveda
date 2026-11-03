@@ -1,7 +1,13 @@
 <section class="page-head">
-  <div class="container">
-    <h1><%= heading %></h1>
-    <% if (typeof sub !== 'undefined') { %><p class="lead mb-3"><%= sub %></p><% } %>
-    <%- include('beads') %>
+  <div class="container position-relative z-2">
+    <div class="page-head-content">
+      <h1 class="page-head-title"><%= heading %></h1>
+      <% if (typeof sub !== 'undefined') { %>
+        <p class="lead page-head-sub mb-3"><%= sub %></p>
+      <% } %>
+      <div class="page-head-beads">
+        <%- include('beads') %>
+      </div>
+    </div>
   </div>
 </section>

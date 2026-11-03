@@ -1,27 +1,65 @@
 <%- include('partials/header') %>
-<h1 class="h3 mb-3">Messages</h1>
-<div class="admin-card">
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1 fw-bold text-dark"><i class="bi bi-envelope-fill text-primary me-2"></i>Inquiries & Messages</h1>
+    <p class="text-muted small mb-0">Messages submitted through the public website contact form.</p>
+  </div>
+</div>
+
+<div class="admin-card shadow-sm">
   <% if (messages.length === 0) { %>
-    <p class="text-muted mb-0">No messages yet.</p>
+    <div class="p-5 text-center text-muted">
+      <i class="bi bi-inbox display-4 d-block mb-3"></i>
+      <h3 class="h5">Inbox is currently empty</h3>
+      <p class="mb-0">When parents inquire or book a demo from the contact page, their messages will arrive here.</p>
+    </div>
   <% } else { %>
     <div class="table-responsive">
-      <table class="table mb-0 table-stack">
-        <thead><tr><th>Date</th><th>From</th><th>Batch</th><th>Message</th><th></th></tr></thead>
+      <table class="table align-middle table-hover mb-0 table-stack">
+        <thead class="table-light">
+          <tr>
+            <th>Date & Time</th>
+            <th>Parent / Sender</th>
+            <th>Message</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
         <tbody>
           <% messages.forEach(m => { %>
             <tr>
-              <td class="text-nowrap"><%= new Date(m.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) %></td>
-              <td>
-                <strong><%= m.name %></strong><br>
-                <a href="tel:<%= m.phone %>"><%= m.phone %></a>
-                <% if (m.email) { %><br><a href="mailto:<%= m.email %>"><%= m.email %></a><% } %>
+              <td class="text-nowrap">
+                <span class="d-block fw-semibold text-dark"><%= new Date(m.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+                <small class="text-muted"><%= new Date(m.created_at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) %></small>
               </td>
-              <td><%= m.batch_interest || '-' %></td>
-              <td class="msg-text"><%= m.message %></td>
-              <td class="text-end">
-                <form method="POST" action="/admin/messages/<%= m.id %>/delete" onsubmit="return confirm('Delete this message?')">
+              <td>
+                <strong class="d-block text-dark"><%= m.name %></strong>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <a href="tel:<%= m.phone %>" class="badge text-bg-light border text-primary text-decoration-none">
+                    <i class="bi bi-telephone-fill me-1"></i><%= m.phone %>
+                  </a>
+                  <% if (m.email) { %>
+                    <a href="mailto:<%= m.email %>" class="badge text-bg-light border text-muted text-decoration-none">
+                      <i class="bi bi-envelope me-1"></i><%= m.email %>
+                    </a>
+                  <% } %>
+                </div>
+              </td>
+              <td>
+                <div class="msg-text text-dark" style="max-width: 480px;"><%= m.message %></div>
+              </td>
+              <td class="text-end text-nowrap">
+                <a href="tel:<%= m.phone %>" class="btn btn-sm btn-outline-success rounded-pill px-2 me-1" title="Call">
+                  <i class="bi bi-telephone"></i>
+                </a>
+                <a href="https://wa.me/<%= m.phone.replace(/[^0-9]/g, '') %>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success rounded-pill px-2 me-1" title="WhatsApp">
+                  <i class="bi bi-whatsapp"></i>
+                </a>
+                <form method="POST" action="/admin/messages/<%= m.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this message?')">
                   <input type="hidden" name="_csrf" value="<%= csrf %>">
-                  <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                  <button class="btn btn-sm btn-outline-danger rounded-pill px-2" type="submit" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </form>
               </td>
             </tr>
@@ -31,4 +69,5 @@
     </div>
   <% } %>
 </div>
+
 <%- include('partials/footer') %>

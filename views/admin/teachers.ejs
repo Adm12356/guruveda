@@ -1,37 +1,105 @@
 <%- include('partials/header') %>
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-  <h1 class="h3 mb-0">Teachers</h1>
-  <a class="btn btn-primary" href="/admin/teachers/new">Add teacher</a>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1 fw-bold text-dark"><i class="bi bi-person-badge-fill text-primary me-2"></i>Teachers & Staff</h1>
+    <p class="text-muted small mb-0">Overview of all institute teachers, assigned batches, and student workloads.</p>
+  </div>
+  <a class="btn btn-primary rounded-pill px-4 shadow-sm" href="/admin/teachers/new">
+    <i class="bi bi-person-plus-fill me-1"></i>Add Teacher
+  </a>
 </div>
 
 <div class="row g-3 mb-4">
-  <div class="col-4"><div class="admin-card"><div class="stat"><%= totals.batches %></div><div class="text-muted">Batches</div></div></div>
-  <div class="col-4"><div class="admin-card"><div class="stat"><%= totals.students %></div><div class="text-muted">Students</div></div></div>
-  <div class="col-4"><div class="admin-card"><div class="stat"><%= totals.exams %></div><div class="text-muted">Exams conducted</div></div></div>
+  <div class="col-md-4">
+    <div class="mini-stat-card border-left-primary">
+      <div class="mini-stat-icon text-primary"><i class="bi bi-collection"></i></div>
+      <div>
+        <div class="mini-stat-val"><%= totals.batches %></div>
+        <div class="mini-stat-lbl">Total Batches</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="mini-stat-card border-left-teal">
+      <div class="mini-stat-icon text-teal"><i class="bi bi-people"></i></div>
+      <div>
+        <div class="mini-stat-val"><%= totals.students %></div>
+        <div class="mini-stat-lbl">Total Students</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="mini-stat-card border-left-amber">
+      <div class="mini-stat-icon text-warning"><i class="bi bi-journal-check"></i></div>
+      <div>
+        <div class="mini-stat-val"><%= totals.exams %></div>
+        <div class="mini-stat-lbl">Exams Conducted</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="admin-card">
+<div class="admin-card shadow-sm">
   <div class="table-responsive">
-    <table class="table mb-0 table-stack">
-      <thead><tr><th>Teacher</th><th>Username</th><th>Batches</th><th>Students</th><th>Exams conducted</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+    <table class="table align-middle table-hover mb-0 table-stack">
+      <thead class="table-light">
+        <tr>
+          <th>Teacher</th>
+          <th>Username</th>
+          <th>Batches</th>
+          <th>Students</th>
+          <th>Exams Conducted</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
       <tbody>
         <% teachers.forEach(t => { %>
           <tr>
-            <td><%= t.name || t.username %><% if (t.role === 'owner') { %> <span class="badge text-bg-primary">Owner</span><% } %></td>
-            <td><code><%= t.username %></code></td>
-            <td><%= t.batches %></td>
-            <td><%= t.students %></td>
-            <td><%= t.exams_conducted %><% if (t.exams_created > t.exams_conducted) { %> <span class="text-muted small">(<%= t.exams_created %> created)</span><% } %></td>
-            <td><span class="badge text-bg-<%= t.is_active ? 'success' : 'secondary' %>"><%= t.is_active ? 'Active' : 'Disabled' %></span></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="student-avatar-circle" style="background: <%= t.role === 'owner' ? '#fef3c7; color: #b45309;' : '#e0f2fe; color: #0369a1;' %>">
+                  <%= (t.name || t.username).charAt(0).toUpperCase() %>
+                </div>
+                <div>
+                  <strong class="d-block text-dark"><%= t.name || t.username %></strong>
+                  <% if (t.role === 'owner') { %>
+                    <span class="badge text-bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>Institute Owner</span>
+                  <% } else { %>
+                    <span class="badge text-bg-light border text-muted">Teacher</span>
+                  <% } %>
+                </div>
+              </div>
+            </td>
+            <td><code class="bg-light px-2 py-1 rounded border text-primary"><%= t.username %></code></td>
+            <td><span class="fw-semibold"><%= t.batches %></span> batches</td>
+            <td><span class="fw-semibold"><%= t.students %></span> students</td>
+            <td>
+              <span class="fw-bold text-success"><%= t.exams_conducted %></span>
+              <% if (t.exams_created > t.exams_conducted) { %>
+                <small class="text-muted d-block">(<%= t.exams_created %> created)</small>
+              <% } %>
+            </td>
+            <td>
+              <span class="badge rounded-pill <%= t.is_active ? 'text-bg-success' : 'text-bg-secondary' %> px-3 py-1">
+                <%= t.is_active ? 'Active' : 'Disabled' %>
+              </span>
+            </td>
             <td class="text-end text-nowrap">
-              <a class="btn btn-sm btn-primary" href="/admin/teachers/<%= t.id %>">View full</a>
-              <a class="btn btn-sm btn-outline-primary" href="/admin/teachers/<%= t.id %>/edit">Edit</a>
+              <a class="btn btn-sm btn-primary rounded-pill px-3 me-1" href="/admin/teachers/<%= t.id %>">
+                <i class="bi bi-person-lines-fill me-1"></i>View Full
+              </a>
+              <a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="/admin/teachers/<%= t.id %>/edit">
+                <i class="bi bi-pencil me-1"></i>Edit
+              </a>
             </td>
           </tr>
         <% }) %>
       </tbody>
     </table>
   </div>
-  <p class="text-muted small mt-3 mb-0">"Exams conducted" counts exams that at least one student has taken up to today.</p>
+  <p class="text-muted small mt-3 mb-0"><i class="bi bi-info-circle me-1"></i>"Exams conducted" counts assessments that at least one student has taken.</p>
 </div>
+
 <%- include('partials/footer') %>

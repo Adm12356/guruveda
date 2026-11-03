@@ -3,31 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1b2a5b">
+  <meta name="theme-color" content="#101c44">
   <meta name="robots" content="noindex, nofollow">
-  <title>Admin login</title>
+  <title>Admin & Teacher Login | Guruveda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="/css/admin.css" rel="stylesheet">
 </head>
-<body>
-  <div class="login-wrap px-3">
-    <div class="admin-card">
-      <h1 class="h4 mb-3">Admin login</h1>
-      <% if (error) { %><div class="alert alert-danger" role="alert"><%= error %></div><% } %>
-      <form method="POST" action="/admin/login">
-        <input type="hidden" name="_csrf" value="<%= csrf %>">
-        <div class="mb-3">
-          <label for="username" class="form-label">Username</label>
-          <input type="text" class="form-control" id="username" name="username" autocomplete="username" required autofocus>
+<body class="login-page-body">
+  <div class="login-wrapper">
+    <div class="login-card shadow-lg">
+      <div class="login-card-header text-center">
+        <div class="login-icon-circle bg-primary text-white">
+          <i class="bi bi-shield-lock-fill"></i>
         </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
+        <h1 class="h4 mt-3 mb-1 fw-bold text-dark">Staff Portal</h1>
+        <p class="text-muted small mb-0">Admin & Teacher Sign In</p>
+      </div>
+
+      <div class="login-card-body p-4 p-sm-5">
+        <% if (error) { %>
+          <div class="alert alert-danger d-flex align-items-center rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+            <div><%= error %></div>
+          </div>
+        <% } %>
+
+        <form method="POST" action="/admin/login">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          
+          <div class="mb-3">
+            <label for="username" class="form-label fw-semibold">Username or Email</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" autocomplete="username" required autofocus>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="password" class="form-label fw-semibold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-key"></i></span>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" autocomplete="current-password" required>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm" type="submit">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Sign In to Dashboard
+          </button>
+        </form>
+
+        <div class="mt-4 pt-3 border-top text-center">
+          <p class="small text-muted mb-2">Are you a student?</p>
+          <a href="/student/login" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+            <i class="bi bi-mortarboard me-1"></i>Student Login Portal
+          </a>
         </div>
-        <button class="btn btn-primary w-100" type="submit">Log in</button>
-      </form>
+      </div>
     </div>
-    <p class="text-center mt-3"><a href="/">Back to website</a></p>
+    <div class="text-center mt-3">
+      <a href="/" class="text-decoration-none text-muted small">
+        <i class="bi bi-arrow-left me-1"></i>Back to Main Website
+      </a>
+    </div>
   </div>
 </body>
 </html>

@@ -44,7 +44,21 @@ router.post('/login', async (req, res, next) => {
   try {
     const username = (req.body.username || '').trim().toLowerCase();
     const password = req.body.password || '';
-    const [rows] = await db.query('SELECT * FROM students WHERE username = ? AND is_active = 1', [username]);
+    let rows;
+    try {
+      [rows] = await db.query('SELECT * FROM students WHERE username = ? AND is_active = 1', [username]);
+    } catch (e) {
+      if (e.code === 'ER_BAD_FIELD_ERROR') {
+        try {
+          await db.query('ALTER TABLE `students` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1');
+          [rows] = await db.query('SELECT * FROM students WHERE username = ? AND is_active = 1', [username]);
+        } catch (e2) {
+          [rows] = await db.query('SELECT * FROM students WHERE username = ?', [username]);
+        }
+      } else {
+        throw e;
+      }
+    }
     const ok = rows.length && await bcrypt.compare(password, rows[0].password_hash);
     if (!ok) {
       recordFail(ip);
@@ -69,9 +83,16 @@ router.post('/logout', (req, res) => {
 router.use(async (req, res, next) => {
   try {
     if (!req.session.student) return res.redirect('/student/login');
-    const [rows] = await db.query(
-      'SELECT s.id, s.name, s.username, s.batch_id, b.name AS batch_name FROM students s LEFT JOIN batches b ON b.id = s.batch_id WHERE s.id = ? AND s.is_active = 1',
-      [req.session.student.id]);
+    let rows;
+    try {
+      [rows] = await db.query('SELECT s.id, s.name, s.username, s.batch_id, b.name AS batch_name FROM students s LEFT JOIN batches b ON b.id = s.batch_id WHERE s.id = ? AND s.is_active = 1', [req.session.student.id]);
+    } catch (e) {
+      if (e.code === 'ER_BAD_FIELD_ERROR') {
+        [rows] = await db.query('SELECT s.id, s.name, s.username, s.batch_id, b.name AS batch_name FROM students s LEFT JOIN batches b ON b.id = s.batch_id WHERE s.id = ?', [req.session.student.id]);
+      } else {
+        throw e;
+      }
+    }
     if (!rows.length) return req.session.destroy(() => res.redirect('/student/login'));
     req.student = rows[0];
     res.locals.student = rows[0];

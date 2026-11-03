@@ -1,51 +1,122 @@
 <%- include('partials/header') %>
-<%- include('partials/page-header', { heading: 'Contact us', sub: 'Send a message or book a free demo class. We will call you back.' }) %>
+<%- include('partials/page-header', { heading: 'Contact Us', sub: 'Book a free demo class or ask us anything. We would love to meet you!' }) %>
 
 <section class="section">
   <div class="container">
     <div class="row gy-5">
+      <!-- Contact Form -->
       <div class="col-lg-7">
-        <% if (errors.length) { %>
-          <div class="alert alert-danger" role="alert">
-            <ul class="mb-0">
-              <% errors.forEach(err => { %><li><%= err %></li><% }) %>
-            </ul>
-          </div>
-        <% } %>
-        <form method="POST" action="/contact" novalidate>
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label for="name" class="form-label">Your name</label>
-              <input type="text" class="form-control" id="name" name="name" value="<%= form.name %>" required>
-            </div>
-            <div class="col-md-6">
-              <label for="phone" class="form-label">Phone number</label>
-              <input type="tel" class="form-control" id="phone" name="phone" value="<%= form.phone %>" required>
-            </div>
-            <div class="col-md-6">
-              <label for="email" class="form-label">Email (optional)</label>
-              <input type="email" class="form-control" id="email" name="email" value="<%= form.email %>">
-            </div>
-            <div class="col-12">
-              <label for="message" class="form-label">Message</label>
-              <textarea class="form-control" id="message" name="message" rows="5" required><%= form.message %></textarea>
-            </div>
-            <div class="col-12">
-              <button type="submit" class="btn btn-bead btn-lg">Send message</button>
+        <div class="contact-card-form p-4 p-md-5 rounded-4 bg-white shadow-sm border border-light-subtle">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="contact-form-icon"><i class="bi bi-chat-heart-fill"></i></span>
+            <div>
+              <h2 class="h4 mb-0">Send a Message</h2>
+              <small class="text-muted">We usually reply or call back within a few hours.</small>
             </div>
           </div>
-        </form>
+
+          <% if (errors.length) { %>
+            <div class="alert alert-danger alert-dismissible fade show modern-alert" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <ul class="mb-0 ps-3">
+                <% errors.forEach(err => { %><li><%= err %></li><% }) %>
+              </ul>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% } %>
+
+          <form method="POST" action="/contact" novalidate class="mt-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="name" class="form-label fw-semibold">Parent / Student Name <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Rahul Sharma" value="<%= form.name %>" required>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="phone" class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                  <input type="tel" class="form-control" id="phone" name="phone" placeholder="+91 98765 43210" value="<%= form.phone %>" required>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label for="email" class="form-label fw-semibold">Email Address <span class="text-muted fw-normal">(optional)</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" value="<%= form.email %>">
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label for="message" class="form-label fw-semibold">Your Message or Child's Age <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="message" name="message" rows="4" placeholder="Tell us your child's age, standard, or any questions about demo classes..." required><%= form.message %></textarea>
+              </div>
+
+              <div class="col-12 pt-2">
+                <button type="submit" class="btn btn-bead btn-lg w-100 shadow-sm">
+                  <i class="bi bi-send-fill me-2"></i>Send Message & Book Demo
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
+
+      <!-- Quick Info & Location -->
       <div class="col-lg-5">
-        <h2 class="h4">Visit or call</h2>
-        <address>
-          <%= site.address %><br>
-          <a href="tel:<%= site.phone.replace(/\s/g, '') %>"><%= site.phone %></a><br>
-          <a href="mailto:<%= site.email %>"><%= site.email %></a>
-        </address>
-        <p><strong>Open:</strong> <%= site.hours %></p>
-        <!-- Paste a Google Maps embed <iframe> here -->
-        <div class="map-slot">Map goes here</div>
+        <div class="contact-info-panel h-100 d-flex flex-column justify-content-between">
+          <div class="mb-4">
+            <h2 class="h4 mb-3">Visit or Reach Out</h2>
+            
+            <div class="contact-info-card mb-3">
+              <div class="contact-card-icon"><i class="bi bi-telephone-outbound-fill text-primary"></i></div>
+              <div>
+                <strong class="d-block text-dark">Call Us Directly</strong>
+                <a href="tel:<%= site.phone.replace(/\s/g, '') %>" class="text-decoration-none fs-5 fw-bold text-primary"><%= site.phone %></a>
+                <div class="small text-muted">Direct line for admissions & queries</div>
+              </div>
+            </div>
+
+            <div class="contact-info-card mb-3">
+              <div class="contact-card-icon"><i class="bi bi-envelope-at-fill text-teal"></i></div>
+              <div>
+                <strong class="d-block text-dark">Email Support</strong>
+                <a href="mailto:<%= site.email %>" class="text-decoration-none fw-semibold text-teal"><%= site.email %></a>
+                <div class="small text-muted">We reply within 24 hours</div>
+              </div>
+            </div>
+
+            <div class="contact-info-card mb-3">
+              <div class="contact-card-icon"><i class="bi bi-geo-alt-fill text-danger"></i></div>
+              <div>
+                <strong class="d-block text-dark">Head Office Location</strong>
+                <address class="mb-0 text-muted"><%= site.address %></address>
+              </div>
+            </div>
+
+            <div class="contact-info-card">
+              <div class="contact-card-icon"><i class="bi bi-clock-fill text-warning"></i></div>
+              <div>
+                <strong class="d-block text-dark">Visiting Hours</strong>
+                <span class="text-muted"><%= site.hours %></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stylized Map Widget -->
+          <div class="map-showcase-box rounded-4 p-4 text-center">
+            <i class="bi bi-map-fill fs-2 text-primary mb-2 d-block"></i>
+            <h3 class="h6 mb-1">Centres across Mumbai & Pune</h3>
+            <p class="small text-muted mb-3">We have 10+ main centres and franchise locations ready to welcome you.</p>
+            <a href="/about#branches" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-buildings me-1"></i>View All Branches
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>

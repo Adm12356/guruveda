@@ -1,34 +1,118 @@
 <%- include('partials/header') %>
-<% const pct = fmt.percent(attempt.score, attempt.total_marks); const passed = pct >= exam.pass_percent; %>
-<h1 class="h3 mb-3"><%= exam.title %></h1>
+<% 
+  const pct = fmt.percent(attempt.score, attempt.total_marks); 
+  const passed = pct >= exam.pass_percent; 
+%>
+
+<div class="result-hero-card mb-4 <%= passed ? 'passed-bg' : 'failed-bg' %> shadow-sm rounded-4 p-4 p-md-5 text-center text-white">
+  <div class="result-badge-icon mb-3">
+    <span class="display-3"><%= passed ? '🏆' : '📚' %></span>
+  </div>
+  <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-1 mb-2">Test Assessment Report</span>
+  <h1 class="h2 text-white mb-2"><%= exam.title %></h1>
+  <p class="text-white text-opacity-90 max-w-600 mx-auto mb-4">
+    <%= passed ? 'Fantastic work! You have successfully passed this level exam.' : 'Good effort! Review the questions below and try again to improve your score.' %>
+  </p>
+
+  <div class="result-score-chip d-inline-flex align-items-center gap-3 bg-white text-dark rounded-pill px-4 py-2 shadow">
+    <div class="text-start">
+      <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Your Score</small>
+      <span class="h4 mb-0 fw-bold text-primary"><%= attempt.score %> / <%= attempt.total_marks %></span>
+    </div>
+    <div class="vr"></div>
+    <div class="text-start">
+      <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Percentage</small>
+      <span class="h4 mb-0 fw-bold <%= passed ? 'text-success' : 'text-danger' %>"><%= pct %>%</span>
+    </div>
+    <div class="vr"></div>
+    <div class="text-start">
+      <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Status</small>
+      <span class="badge rounded-pill <%= passed ? 'text-bg-success' : 'text-bg-danger' %> px-3 py-1"><%= passed ? 'Pass' : 'Fail' %></span>
+    </div>
+  </div>
+</div>
 
 <div class="row g-3 mb-4">
-  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= attempt.score %> / <%= attempt.total_marks %></div><div class="text-muted">Score</div></div></div>
-  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= pct %>%</div><div class="text-muted">Percentage</div></div></div>
-  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><span class="text-<%= passed ? 'success' : 'danger' %>"><%= passed ? 'Pass' : 'Fail' %></span></div><div class="text-muted">Pass mark <%= exam.pass_percent %>%</div></div></div>
-  <div class="col-6 col-md-3"><div class="admin-card"><div class="stat"><%= fmt.duration(new Date(attempt.submitted_at) - new Date(attempt.started_at)) %></div><div class="text-muted"><%= fmt.statusLabel(attempt.status) %></div></div></div>
+  <div class="col-6 col-md-3">
+    <div class="admin-card text-center">
+      <div class="stat text-primary"><%= attempt.score %> / <%= attempt.total_marks %></div>
+      <div class="text-muted small">Total Points</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="admin-card text-center">
+      <div class="stat <%= passed ? 'text-success' : 'text-danger' %>"><%= pct %>%</div>
+      <div class="text-muted small">Achieved %</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="admin-card text-center">
+      <div class="stat text-dark"><%= exam.pass_percent %>%</div>
+      <div class="text-muted small">Required Passing %</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="admin-card text-center">
+      <div class="stat text-muted"><%= fmt.duration(new Date(attempt.submitted_at) - new Date(attempt.started_at)) %></div>
+      <div class="text-muted small"><%= fmt.statusLabel(attempt.status) %></div>
+    </div>
+  </div>
 </div>
 
 <% if (exam.show_answers) { %>
-<div class="admin-card mb-4">
-  <h2 class="h5 mb-3">Answer review</h2>
-  <div class="table-responsive">
-    <table class="table mb-0 table-stack">
-      <thead><tr><th>#</th><th>Question</th><th>Your answer</th><th>Correct answer</th><th>Marks</th></tr></thead>
-      <tbody>
-        <% review.forEach((q, i) => { const right = q.selected_option === q.correct_option; %>
-          <tr>
-            <td><%= i + 1 %></td>
-            <td class="msg-text"><%= q.question_text %></td>
-            <td><% if (q.selected_option) { %><span class="badge text-bg-<%= right ? 'success' : 'danger' %>"><%= q.selected_option %></span> <%= q['option_' + q.selected_option.toLowerCase()] %><% } else { %><span class="text-muted">Not answered</span><% } %></td>
-            <td><span class="badge text-bg-success"><%= q.correct_option %></span> <%= q['option_' + q.correct_option.toLowerCase()] %></td>
-            <td><%= right ? q.marks : 0 %> / <%= q.marks %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+<div class="admin-card mb-4 shadow-sm">
+  <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-card-checklist text-primary fs-5"></i>
+      <h2 class="h5 mb-0 fw-bold">Detailed Question Review</h2>
+    </div>
+    <span class="badge text-bg-light border text-muted">Answers & Feedback</span>
+  </div>
+  
+  <div class="review-questions-list">
+    <% review.forEach((q, i) => { const right = q.selected_option === q.correct_option; %>
+      <div class="review-q-card p-3 mb-3 rounded-3 border <%= right ? 'border-success-subtle bg-success-subtle bg-opacity-10' : 'border-danger-subtle bg-danger-subtle bg-opacity-10' %>">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+          <div class="fw-bold">
+            <span class="badge <%= right ? 'bg-success' : 'bg-danger' %> rounded-pill me-1">Q<%= i + 1 %></span>
+            <%= q.question_text %>
+          </div>
+          <span class="badge rounded-pill <%= right ? 'text-bg-success' : 'text-bg-danger' %>">
+            <%= right ? '+' + q.marks : '0' %> / <%= q.marks %> marks
+          </span>
+        </div>
+
+        <div class="row g-2 mt-2">
+          <div class="col-md-6">
+            <div class="p-2 rounded-3 <%= right ? 'bg-success bg-opacity-25' : 'bg-danger bg-opacity-25' %>">
+              <small class="text-muted d-block" style="font-size: 0.75rem;">YOUR ANSWER</small>
+              <% if (q.selected_option) { %>
+                <strong class="<%= right ? 'text-success' : 'text-danger' %>"><%= q.selected_option %>:</strong> <%= q['option_' + q.selected_option.toLowerCase()] %>
+              <% } else { %>
+                <span class="text-muted fst-italic">Not Answered</span>
+              <% } %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-2 rounded-3 bg-success bg-opacity-25">
+              <small class="text-muted d-block" style="font-size: 0.75rem;">CORRECT ANSWER</small>
+              <strong class="text-success"><%= q.correct_option %>:</strong> <%= q['option_' + q.correct_option.toLowerCase()] %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
   </div>
 </div>
 <% } %>
-<a class="btn btn-outline-primary" href="/student/results">All my results</a>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <a class="btn btn-outline-primary rounded-pill px-4" href="/student/results">
+    <i class="bi bi-arrow-left me-1"></i>All My Results
+  </a>
+  <a class="btn btn-primary rounded-pill px-4" href="/student/exams">
+    <i class="bi bi-pencil-square me-1"></i>Take Another Exam
+  </a>
+</div>
+
 <%- include('partials/footer') %>

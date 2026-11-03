@@ -51,7 +51,16 @@ router.use((req, res, next) => {
 const requireAuth = async (req, res, next) => {
   try {
     if (!req.session.admin) return res.redirect('/admin/login');
-    const [rows] = await db.query('SELECT id, username, name, role FROM admins WHERE id = ? AND is_active = 1', [req.session.admin.id]);
+    let rows;
+    try {
+      [rows] = await db.query('SELECT id, username, name, role FROM admins WHERE id = ? AND is_active = 1', [req.session.admin.id]);
+    } catch (e) {
+      if (e.code === 'ER_BAD_FIELD_ERROR') {
+        [rows] = await db.query('SELECT id, username, name, role FROM admins WHERE id = ?', [req.session.admin.id]);
+      } else {
+        throw e;
+      }
+    }
     if (!rows.length) return req.session.destroy(() => res.redirect('/admin/login'));
     req.admin = rows[0];
     res.locals.admin = rows[0];
@@ -74,7 +83,21 @@ router.post('/login', async (req, res, next) => {
   try {
     const username = (req.body.username || '').trim();
     const password = req.body.password || '';
-    const [rows] = await db.query('SELECT * FROM admins WHERE username = ? AND is_active = 1', [username]);
+    let rows;
+    try {
+      [rows] = await db.query('SELECT * FROM admins WHERE username = ? AND is_active = 1', [username]);
+    } catch (e) {
+      if (e.code === 'ER_BAD_FIELD_ERROR') {
+        try {
+          await db.query('ALTER TABLE `admins` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1');
+          [rows] = await db.query('SELECT * FROM admins WHERE username = ? AND is_active = 1', [username]);
+        } catch (e2) {
+          [rows] = await db.query('SELECT * FROM admins WHERE username = ?', [username]);
+        }
+      } else {
+        throw e;
+      }
+    }
     const ok = rows.length && await bcrypt.compare(password, rows[0].password_hash);
     if (!ok) {
       recordFail(ip);
@@ -110,7 +133,7 @@ router.get('/', async (req, res, next) => {
     let site = null;
     if (req.admin.role === 'owner') {
       site = {
-        teachers: await count("SELECT COUNT(*) AS n FROM admins WHERE role = 'teacher' AND is_active = 1"),
+        teachers: await count("SELECT COUNT(*) AS n FROM admins WHERE role = 'teacher'").catch(() => 0),
         students: await count('SELECT COUNT(*) AS n FROM students'),
         events: await count('SELECT COUNT(*) AS n FROM events WHERE event_date >= NOW()'),
         messages: await count('SELECT COUNT(*) AS n FROM contact_messages'),
